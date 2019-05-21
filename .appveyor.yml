@@ -37,7 +37,7 @@ install:
     - "conda config --set always_yes yes --set changeps1 no"
     - "conda update -q conda"
     - "conda info -a"
-    - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy pandas matplotlib h5py setuptools sphinx sphinx_rtd_theme numpydoc nose mkl mkl-service vtk=8.1.2 theano pytables"
+    - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy pandas matplotlib h5py setuptools sphinx sphinx_rtd_theme numpydoc nose mkl mkl-service vtk=8.1.1 theano pytables"
     #- "conda create -q -n test-environment python=%PYTHON_VERSION% setuptools"
     - activate test-environment
     #- "conda install numpy"
