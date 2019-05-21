@@ -3,15 +3,15 @@ language: python
 matrix:
    include:
       - os: linux
-        python: 3.5
+        python: 3.7
         env:
-          - PYCONDA=3.5
-          - PYDIST=35
-      - os: linux
-        python: 3.6
-        env:
-          - PYCONDA=3.6
-          - PYDIST=36
+          - PYCONDA=3.7
+          - PYDIST=37
+#      - os: linux
+#        python: 3.6
+#        env:
+#          - PYCONDA=3.6
+#          - PYDIST=36
 
 branches:
   only:
@@ -54,7 +54,7 @@ deploy:
   #    - "dist/amfe-0.2-cp${PYDIST}-cp${PYDIST}m-linux_x86_64.whl"
   on:
     tags: true
-    repo: AppliedMechanics/AMfe
+    repo: c-meyer/AMfe
     # branch condition cannot be done if tags: true
     #branch:
     #  - master
