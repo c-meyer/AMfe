@@ -58,7 +58,7 @@ install:
     - "copy /Y cygwinccompiler.py %MINICONDA%\\envs\\test-environment\\Lib\\distutils\\cygwinccompiler.py"
     - "copy /Y mingw32ccompiler.py %MINICONDA%\\envs\\test-environment\\Lib\\site-packages\\numpy\\distutils\\mingw32ccompiler.py"
     - "cd .."
-    - "python setup.py develop"
+    - "python setup.py develop no_feti"
 
 build: off
 
