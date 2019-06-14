@@ -39,6 +39,8 @@ install: "python setup.py develop no_feti"
 script:
    - "conda list"
    - "dir"
+   - "python"
+   - "exit()"
    - "nosetests"
    - "cd docs"
    - "make html"
