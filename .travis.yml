@@ -30,7 +30,7 @@ before_install:
 - conda update -q conda
 - conda info -a
 # - conda create -q -n test-environment python=${PYCONDA} setuptools numpy=1.14 scipy pandas matplotlib h5py sphinx sphinx_rtd_theme numpydoc nose mkl theano vtk=8.2.0 pytables
-- conda create -q -n test-environment python=${PYCONDA} setuptools numpy
+- conda create -q -n test-environment python=${PYCONDA} setuptools numpy nose
 - source activate test-environment
 
 
@@ -39,8 +39,6 @@ install: "python setup.py develop no_feti"
 script:
    - "conda list"
    - "dir"
-   - "python"
-   - "exit()"
    - "nosetests"
    - "cd docs"
    - "make html"
