@@ -32,9 +32,10 @@ before_install:
 # - conda create -q -n test-environment python=${PYCONDA} setuptools numpy=1.14 scipy pandas matplotlib h5py sphinx sphinx_rtd_theme numpydoc nose mkl theano vtk=8.2.0 pytables
 
 install: 
-   - "conda create -q -n test-environment python=${PYCONDA} setuptools numpy nose sphinx sphinx_rtd_theme numpydoc"
+   - "conda create -q -n test-environment python=${PYCONDA} python=3.7"
    - "source activate test-environment"
-   - "python setup.py develop no_feti"
+   - "python conda_setup.py"
+   - "python setup_develop.py develop no_feti"
 
 script:
    - "nosetests"
