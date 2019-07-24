@@ -37,9 +37,9 @@ install:
     - "conda config --set always_yes yes --set changeps1 no"
     - "conda update -q conda"
     - "conda create -q -n test-environment python=%PYTHON_VERSION%"
-    - activate test-environment
+    - "activate test-environment"
     - "cd C:\\projects\\amfe-2tyct"
-    - python conda_setup.py
+    - "python conda_setup.py"
     #- "cd AppVeyor"
     - "cd %MINICONDA%\\envs\\test-environment\\Lib"
     - "dir"
