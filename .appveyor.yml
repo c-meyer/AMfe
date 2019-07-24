@@ -58,21 +58,21 @@ build: off
 test_script:
   - "nosetests"
 
-after_test:
-  - "python setup.py bdist_wheel"
+#after_test:
+#  - "python setup.py bdist_wheel"
 
-artifacts:
-  - path: dist\*
-
-deploy:
-   description: "AMfe stable build for windows"
-   provider: GitHub
-   auth_token:
-     secure: 9w2YwyYMLgiROCNPdsBTFr4n8/6nY67EmD+R1sE8gqVfo0FA9yJ3kq/1JqtBcxIg
+#artifacts:
+#  - path: dist\*
+#
+# deploy:
+#   description: "AMfe stable build for windows"
+#   provider: GitHub
+#   auth_token:
+#     secure:
    #artifact: /^dist\\amfe.*whl$/
-   on:
+   #on:
      # branch condition deactivated becaus cannot be used with appveyor_repo_tag:true
      # branch:
       #  - "master"
       #  - "/^release-.*$/"
-     appveyor_repo_tag: true
+#     appveyor_repo_tag: true
