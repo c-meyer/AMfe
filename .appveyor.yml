@@ -10,8 +10,9 @@ environment:
    matrix:
 
       - PYTHON_VERSION: 3.7
+        MINICONDA: C:\Miniconda37-x64
         PYDIST: 37
-        MINICONDA: C:\Miniconda3-x64
+        # MINICONDA: C:\Miniconda3-x64
         MINGWDIR: C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64
 
       #- PYTHON_VERSION: 3.6
