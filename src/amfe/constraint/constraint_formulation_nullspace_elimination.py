@@ -219,7 +219,7 @@ class NullspaceConstraintFormulation(ConstraintFormulationBase):
             recovered displacements of the unconstrained system
 
         """
-        return np.array([], ndmin=1, dtype=float)
+        return np.array([], ndmin=1, dtype=np.float64)
 
     def M(self, x, dx, t):
         r"""

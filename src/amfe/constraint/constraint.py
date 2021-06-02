@@ -326,7 +326,7 @@ class DirichletConstraint(HolonomicConstraintBase):
         g: ndarray
             Residual of the holonomic constraint function
         """
-        return np.array(u_local - self._U(t), dtype=float)
+        return np.array(u_local - self._U(t), dtype=np.float64)
     
     def B(self, X_local, u_local, t):
         """
@@ -346,7 +346,7 @@ class DirichletConstraint(HolonomicConstraintBase):
         B: ndarray
             Partial derivative of constraint function g w.r.t. displacements u
         """
-        return np.array([1], dtype=float)
+        return np.array([1], dtype=np.float64)
 
     def b(self, X, u, t):
         """
@@ -439,7 +439,7 @@ class FixedDistanceConstraint(HolonomicConstraintBase):
 
         scaling = vector_norm(X2 - X1)
 
-        return np.array((vector_norm(x2 - x1) - vector_norm(X2 - X1)) * 10. / scaling, dtype=float, ndmin=1)
+        return np.array((vector_norm(x2 - x1) - vector_norm(X2 - X1)) * 10. / scaling, dtype=np.float64, ndmin=1)
 
     def B(self, X_local, u_local, t):
         """
@@ -494,7 +494,7 @@ class FixedDistanceConstraint(HolonomicConstraintBase):
         b: ndarray
             Partial derivative of the constraint function g w.r.t. time t
         """
-        return np.array([0.0], dtype=float, ndmin=1)
+        return np.array([0.0], dtype=np.float64, ndmin=1)
 
     def a(self, X, u, du, t):
         r"""
@@ -860,7 +860,7 @@ class FixedDistanceToLineConstraint(HolonomicConstraintBase):
         b: ndarray
             Partial derivative of the constraint function g w.r.t. time t
         """
-        return np.array([0.0], dtype=float, ndmin=1)
+        return np.array([0.0], dtype=np.float64, ndmin=1)
 
     def a(self, X, u, du, t):
         r"""
@@ -1006,7 +1006,7 @@ class NodesCollinear2DConstraint(HolonomicConstraintBase):
         b: ndarray
             Partial derivative of the constraint function g w.r.t. time t
         """
-        return np.array([0.0], dtype=float, ndmin=1)
+        return np.array([0.0], dtype=np.float64, ndmin=1)
 
     def a(self, X, u, du, t):
         r"""
@@ -1066,7 +1066,7 @@ class EqualDisplacementConstraint(HolonomicConstraintBase):
         g : numpy.array
             Residual of constraint function
         """
-        return np.array([u_local[1] - u_local[0]], dtype=float, ndmin=1)
+        return np.array([u_local[1] - u_local[0]], dtype=np.float64, ndmin=1)
 
     def B(self, X_local, u_local, t):
         """
@@ -1086,7 +1086,7 @@ class EqualDisplacementConstraint(HolonomicConstraintBase):
         B: ndarray
             Partial derivative of constraint function g w.r.t. displacements u
         """
-        return np.array([-1.0, 1.0], dtype=float)
+        return np.array([-1.0, 1.0], dtype=np.float64)
 
     def b(self, X, u, t):
         """
@@ -1106,7 +1106,7 @@ class EqualDisplacementConstraint(HolonomicConstraintBase):
         b: ndarray
             Partial derivative of the constraint function g w.r.t. time t
         """
-        return np.array([0.0], dtype=float, ndmin=1)
+        return np.array([0.0], dtype=np.float64, ndmin=1)
 
     def a(self, X, u, du, t):
         r"""
@@ -1232,7 +1232,7 @@ class FixedDistanceToPlaneConstraint(HolonomicConstraintBase):
         X4_vector = X4 - X1
 
         return np.array([np.dot(x4_vector, plane_normal) -
-                         np.dot(X4_vector, ini_plane_normal) ], dtype=float, ndmin=1)
+                         np.dot(X4_vector, ini_plane_normal) ], dtype=np.float64, ndmin=1)
 
     def B(self, X_local, u_local, t):
         """
@@ -1276,7 +1276,7 @@ class FixedDistanceToPlaneConstraint(HolonomicConstraintBase):
         b: ndarray
             Partial derivative of the constraint function g w.r.t. time t
         """
-        return np.array([0.0], dtype=float, ndmin=1)
+        return np.array([0.0], dtype=np.float64, ndmin=1)
 
     def a(self, X, u, du, t):
         raise NotImplementedError('The a entity has not been implemented for the fixed distance to'
@@ -1388,7 +1388,7 @@ class NodesCoplanarConstraint(HolonomicConstraintBase):
         b: ndarray
             Partial derivative of the constraint function g w.r.t. time t
         """
-        return np.array([0.0], dtype=float, ndmin=1)
+        return np.array([0.0], dtype=np.float64, ndmin=1)
 
     def a(self, X, u, du, t):
         r"""

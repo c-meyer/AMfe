@@ -81,7 +81,7 @@ def krylov_basis(M, K, b, n=3, omega=0.0, mass_orth=True,
 
     # compute first krylov vector (K-om**2*M)^(-1) * b
     rows, cols = r.shape
-    first_krylov_vectors = np.zeros((rows, cols), dtype=float)
+    first_krylov_vectors = np.zeros((rows, cols), dtype=np.float64)
     for i, rhs in enumerate(r.T):
         first_krylov_vectors[:, i] = solver.solve(A, rhs)
 
@@ -424,7 +424,7 @@ def modal_derivatives(V, omega, K_func, M, x0=None, h=1.0, verbose=True,
     lambda0 = [om**2 for om in omega]
 
     if out is None:
-        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=float)
+        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=np.float64)
     else:
         Theta = out
 
@@ -492,7 +492,7 @@ def static_derivatives(V, K_func, M=None, shift=None, x0=None, h=1.0,
         x0 = np.zeros(no_of_dofs)
 
     if out is None:
-        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=float)
+        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=np.float64)
     else:
         Theta = out
 
@@ -675,16 +675,16 @@ def modal_derivatives_cruz(V, K_func, M, omega, x0=None, h=1.0,
 
     # Preallocation
     if out_theta is None:
-        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=float)
+        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=np.float64)
     else:
         Theta = out_theta
 
     if out_theta_tilde is None:
-        Theta_tilde = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=float)
+        Theta_tilde = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=np.float64)
     else:
         Theta_tilde = out_theta_tilde
 
-    Shifts = np.zeros((len(omega), len(omega)), dtype=float)
+    Shifts = np.zeros((len(omega), len(omega)), dtype=np.float64)
     Shifts_tilde = np.zeros_like(Shifts)
     for i, omi in enumerate(omega):
         for j, omj in enumerate(omega):
@@ -702,7 +702,7 @@ def modal_derivatives_cruz(V, K_func, M, omega, x0=None, h=1.0,
 
 def merge_bases(V1, V2, atol=1e-14, rtol=1E-8, deflate=True, out=None):
     if out is None:
-        out = np.zeros((V1.shape[0], V1.shape[1] + V2.shape[1]), dtype=float)
+        out = np.zeros((V1.shape[0], V1.shape[1] + V2.shape[1]), dtype=np.float64)
 
     V_raw = np.concatenate((V1, V2), axis=1)
     # Deflation algorithm
@@ -850,7 +850,7 @@ def ranking_of_weighting_matrix(W, symm=True):
     ranking_list = np.argsort(W, axis=None)[::-1]
     if symm:
         assert n == m
-        ranking = np.zeros((n*(n+1)//2, 2), dtype=int)
+        ranking = np.zeros((n*(n+1)//2, 2), dtype=np.intp)
         i = 0
         for val in ranking_list:
             j, k = val // m, val % m
@@ -859,7 +859,7 @@ def ranking_of_weighting_matrix(W, symm=True):
                 i += 1
 
     else:  # not symmetric
-        ranking = np.zeros((n*m, 2), dtype=int)
+        ranking = np.zeros((n*m, 2), dtype=np.intp)
         for i, val in enumerate(ranking_list):
             ranking[i,:] = val // m, val % m
     return ranking

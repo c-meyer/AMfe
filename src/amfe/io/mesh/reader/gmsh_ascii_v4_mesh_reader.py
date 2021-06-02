@@ -305,7 +305,7 @@ class GmshAscii4MeshReader(MeshReader):
             info_entity = data_geometry[index].split()
             entity_id = int(info_entity[1])
             n_nodes_entity = int(info_entity[3])
-            n_list = np.zeros(n_nodes_entity, dtype=int)
+            n_list = np.zeros(n_nodes_entity, dtype=np.intp)
             for j in range(n_nodes_entity):
                 nodeid = int(data_geometry[index + 1 + j])
                 nodecoords = [float(x) for x in data_geometry[
@@ -326,13 +326,13 @@ class GmshAscii4MeshReader(MeshReader):
             element_type = int(info_entity[2])
             shape = self._eletypes[element_type]
             n_ele_in_current_block = int(info_entity[3])
-            e_list = np.zeros(n_ele_in_current_block, dtype=int)
+            e_list = np.zeros(n_ele_in_current_block, dtype=np.intp)
 
             for j in range(n_ele_in_current_block):
                 ele_info = [int(x) for x in data_geometry[
                     index + 1 + j].split()]
                 ele_id = ele_info[0]
-                connectivity = np.array(ele_info[1:], dtype=int)
+                connectivity = np.array(ele_info[1:], dtype=np.intp)
                 e_list[j] = ele_id
 
                 if shape in self._eletypes_3d:
@@ -342,13 +342,13 @@ class GmshAscii4MeshReader(MeshReader):
                 # differently from the numbers used in AMFE and ParaView
                 # (last two indices permuted)
                 if shape == 'Tet10':
-                    connectivity[np.array([9, 8], dtype=int)] = \
-                        connectivity[np.array([8, 9], dtype=int)]
+                    connectivity[np.array([9, 8], dtype=np.intp)] = \
+                        connectivity[np.array([8, 9], dtype=np.intp)]
                 # Same node numbering issue with Hexa20
                 if shape == 'Hexa20':
                     hexa20_gmsh_swap = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 11,
                                                 13, 9, 16, 18, 19,
-                                                17, 10, 12, 14, 15], dtype=int)
+                                                17, 10, 12, 14, 15], dtype=np.intp)
                     connectivity[:] = connectivity[hexa20_gmsh_swap]
 
                 builder.build_element(ele_id, shape, connectivity.tolist())
@@ -368,15 +368,15 @@ class GmshAscii4MeshReader(MeshReader):
         dim2elements = dict()
         entity2elements = dict()
         for dim in dim2entity2eleid.keys():
-            current_arr = np.empty(shape=0, dtype=int)
+            current_arr = np.empty(shape=0, dtype=np.intp)
             for entity_id, value in dim2entity2eleid[dim].items():
                 current_arr = np.union1d(current_arr, np.array(value,
-                                                               dtype=int))
+                                                               dtype=np.intp))
                 if entity_id in entity2elements:
                     entity2elements[entity_id] = np.union1d(
-                        entity2elements[entity_id], np.array(value, dtype=int))
+                        entity2elements[entity_id], np.array(value, dtype=np.intp))
                 else:
-                    entity2elements[entity_id] = np.array(value, dtype=int)
+                    entity2elements[entity_id] = np.array(value, dtype=np.intp)
             dim2elements[dim] = current_arr.tolist()
         for key, value in entity2elements.items():
             entity2elements[key] = value.tolist()
@@ -394,11 +394,11 @@ class GmshAscii4MeshReader(MeshReader):
                     if partition_ids in partition_id2elements:
                         partition_id2elements[partition_ids] = np.union1d(
                             partition_id2elements[partition_ids],
-                            np.array(element_ids, dtype=int)
+                            np.array(element_ids, dtype=np.intp)
                         )
                     else:
                         partition_id2elements[partition_ids] = np.array(
-                            element_ids, dtype=int)
+                            element_ids, dtype=np.intp)
             for key, value in partition_id2elements.items():
                 partition_id2elements[key] = value.tolist()
             builder.build_tag('gmsh_partition_ids', partition_id2elements,
@@ -415,8 +415,8 @@ class GmshAscii4MeshReader(MeshReader):
                     groupname2dimphytag.update({name: [(dim, tag)]})
 
         for name, dim_and_tags in groupname2dimphytag.items():
-            nodeids = np.empty(0, dtype=int)
-            elementids = np.empty(0, dtype=int)
+            nodeids = np.empty(0, dtype=np.intp)
+            elementids = np.empty(0, dtype=np.intp)
             for (dim, tag) in dim_and_tags:
                 if dim == 0:
                     nodeids = np.union1d(nodeids, entity2nodeid[tag])

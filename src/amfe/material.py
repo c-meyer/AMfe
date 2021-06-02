@@ -103,7 +103,7 @@ class BeamMaterial(ShellMaterial):
         self.I_y = I_y
         self.I_z = I_z
         self.J_x = J_x
-        self.X3 = np.array(X3, dtype=float)
+        self.X3 = np.array(X3, dtype=np.float64)
 
     @property
     def I_p(self):

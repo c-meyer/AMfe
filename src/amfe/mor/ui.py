@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 TECHNICAL UNIVERSITY OF MUNICH, DEPARTMENT OF MECHANICAL ENGINEERING, CHAIR OF APPLIED MECHANICS,
+# Copyright (c) 2021 TECHNICAL UNIVERSITY OF MUNICH, DEPARTMENT OF MECHANICAL ENGINEERING, CHAIR OF APPLIED MECHANICS,
 # BOLTZMANNSTRASSE 15, 85748 GARCHING/MUNICH, GERMANY, RIXEN@TUM.DE.
 #
 # Distributed under 3-Clause BSD license. See LICENSE file for more information.
@@ -320,7 +320,7 @@ def ecsw_get_weights_from_constrained_training(x_training, component, formulatio
 
     """
     if timesteps_training is None:
-        timesteps_training = np.zeros(x_training.shape[1], dtype=float)
+        timesteps_training = np.zeros(x_training.shape[1], dtype=np.float64)
     training_set_expanded = [formulation.u(u, t) for u, t in zip(x_training.T, timesteps_training)]
     training_set_expanded = np.array(training_set_expanded).T
     W = [formulation.u(u, 0.0) for u in V.T]

@@ -46,7 +46,7 @@ class AmfeMeshConverter(MeshConverter):
         self._dimension = None
         self._no_of_nodes = None
         self._no_of_elements = None
-        self._nodes = np.empty((0, 4), dtype=float)
+        self._nodes = np.empty((0, 4), dtype=np.float64)
         self._currentnodeid = 0
         self._groups = dict()
         self._tags = dict()
@@ -62,7 +62,7 @@ class AmfeMeshConverter(MeshConverter):
         # It is not necessary to call, but useful if information about no_of_nodes exists
         self._no_of_nodes = no
         if self._nodes.shape[0] == 0:
-            self._nodes = np.zeros((no, 4), dtype=float)
+            self._nodes = np.zeros((no, 4), dtype=np.float64)
         return
 
     def build_no_of_elements(self, no):
@@ -85,13 +85,13 @@ class AmfeMeshConverter(MeshConverter):
             self._nodes[amfeid, :] = [idx, x, y, z]
         else:
             # append node if array is not preallocated with full node dimension
-            self._nodes = np.append(self._nodes, np.array([idx, x, y, z], dtype=float, ndmin=2), axis=0)
+            self._nodes = np.append(self._nodes, np.array([idx, x, y, z], dtype=np.float64, ndmin=2), axis=0)
         self._currentnodeid += 1
         return
 
     def build_element(self, idx, etype, nodes):
         # update df information
-        self._el_df_connectivity.append(np.array(nodes, dtype=int))
+        self._el_df_connectivity.append(np.array(nodes, dtype=np.intp))
         self._el_df_indices.append(idx)
         self._el_df_eleshapes.append(etype)
         return
@@ -126,10 +126,10 @@ class AmfeMeshConverter(MeshConverter):
         x = self._nodes[:, 1]
         y = self._nodes[:, 2]
         if self._dimension == 2:
-            self._mesh.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=np.array(self._nodes[:, 0], dtype=int))
+            self._mesh.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=np.array(self._nodes[:, 0], dtype=np.intp))
         else:
             z = self._nodes[:, 3]
-            self._mesh.nodes_df = pd.DataFrame({'x': x, 'y': y, 'z': z}, index=np.array(self._nodes[:, 0], dtype=int))
+            self._mesh.nodes_df = pd.DataFrame({'x': x, 'y': y, 'z': z}, index=np.array(self._nodes[:, 0], dtype=np.intp))
 
         # divide in boundary and volume elements
         if self._dimension == 3:

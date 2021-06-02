@@ -166,14 +166,14 @@ def set_dirichlet_by_group(component, group_name, direction=('ux'), constraint_n
     nodeids = component._mesh.get_nodeids_by_groups([group_name])
     supportdofs = component._mapping.get_dofs_by_nodeids(nodeids, direction)
     for dof in supportdofs.reshape(-1):
-        component.assign_constraint(constraint_name, dirichlet, np.array([dof], dtype=int), np.array([], dtype=int))
+        component.assign_constraint(constraint_name, dirichlet, np.array([dof], dtype=np.intp), np.array([], dtype=np.intp))
 
 
 def set_dirichlet_by_nodeids(component, nodeids, direction=('ux'), constraint_name='Dirichlet0'):
     dirichlet = component.constraints.create_dirichlet_constraint()
     supportdofs = component._mapping.get_dofs_by_nodeids(nodeids, direction)
     for dof in supportdofs.reshape(-1):
-        component.assign_constraint(constraint_name, dirichlet, np.array([dof], dtype=int), np.array([], dtype=int))
+        component.assign_constraint(constraint_name, dirichlet, np.array([dof], dtype=np.intp), np.array([], dtype=np.intp))
 
 
 def set_neumann_by_group(component, group_name, direction, following=False, neumann_name='Neumann0',
@@ -207,7 +207,7 @@ def set_neumann_by_group(component, group_name, direction, following=False, neum
         else:
             raise ValueError('direction {} not supported'.format(direction))
     else:
-        direction = np.array(direction, dtype=float)  # This would raise an error if cannot be transformed to array
+        direction = np.array(direction, dtype=np.float64)  # This would raise an error if cannot be transformed to array
         if following:
             raise NotImplementedError('There is no implementation for forces that follow the body frame')
         else:
@@ -246,7 +246,7 @@ def set_neumann_by_elementids(component, elementids, direction, following=False,
         else:
             raise ValueError('direction {} not supported'.format(direction))
     else:
-        direction = np.array(direction, dtype=float)  # This would raise an error if cannot be transformed to array
+        direction = np.array(direction, dtype=np.float64)  # This would raise an error if cannot be transformed to array
         if following:
             raise NotImplementedError('There is no implementation for forces that follow the body frame')
         else:

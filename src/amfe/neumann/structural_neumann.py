@@ -18,7 +18,7 @@ class FixedDirectionNeumann(NeumannBase):
 
         Parameters
         ----------
-        direction : ndarray, dtype=float
+        direction : ndarray, dtype=np.float64
             direction of the force
         time_func : function
              pointer to function with signature  float func(float: t)
@@ -68,7 +68,7 @@ class ProjectedAreaNeumann(NeumannBase):
 
         Parameters
         ----------
-        direction : ndarray, dtype=float
+        direction : ndarray, dtype=np.float64
             direction of the force
         time_func : function
              pointer to function with signature  float func(float: t)

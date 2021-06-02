@@ -85,3 +85,5 @@ Other changes
 
 - Fixed import issue in tests for test_io
 - Fixed issue with sphinx and jinja2 incompatibility.
+- Changed all integer dtypes for indexing to dtype=np.intp
+- Changed all float dtypes to np.float64

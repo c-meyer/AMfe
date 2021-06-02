@@ -83,7 +83,7 @@ class StructuralAssembly(Assembly):
         # pre-allocate the CSR-matrix
 
         # pre-allocate row_global with maximal possible size for pre-alloc. C_csr
-        row_global = np.zeros(len(elements2global) * max_dofs_per_element ** 2, dtype=int)
+        row_global = np.zeros(len(elements2global) * max_dofs_per_element ** 2, dtype=np.intp)
         # pre-allocate col_global with maximal possible size for pre-alloc. C_csr
         col_global = row_global.copy()
         # set 'dummy' values
@@ -100,7 +100,7 @@ class StructuralAssembly(Assembly):
             col_global[i * max_dofs_per_element ** 2:(i + 1) * max_dofs_per_element ** 2] = H.T.reshape(-1)
 
         # fill C_csr matrix with dummy entries in those places where matrix will be filled in assembly
-        C_csr = csr_matrix((vals_global, (row_global, col_global)), shape=(no_of_dofs, no_of_dofs), dtype=float)
+        C_csr = csr_matrix((vals_global, (row_global, col_global)), shape=(no_of_dofs, no_of_dofs), dtype=np.float64)
 
         return C_csr
 
@@ -148,7 +148,7 @@ class StructuralAssembly(Assembly):
             K_csr = self.preallocate(no_of_dofs, elements2dofs)
 
         if f_glob is None:
-            f_glob = np.zeros(K_csr.shape[1], dtype=float)
+            f_glob = np.zeros(K_csr.shape[1], dtype=np.float64)
 
         K_csr.data[:] = 0.0
         f_glob[:] = 0.0
@@ -259,7 +259,7 @@ class StructuralAssembly(Assembly):
             K_csr = self.preallocate(no_of_dofs, elements2dofs)
 
         if f_glob is None:
-            f_glob = np.zeros(K_csr.shape[1], dtype=float)
+            f_glob = np.zeros(K_csr.shape[1], dtype=np.float64)
 
         f_glob[:] = 0.0
         K_csr.data[:] = 0.0
@@ -330,7 +330,7 @@ class StructuralAssembly(Assembly):
             dofvalues = np.zeros(maxdof + 1)
 
         if f_glob is None:
-            f_glob = np.zeros(len(dofvalues), dtype=float)
+            f_glob = np.zeros(len(dofvalues), dtype=np.float64)
         f_glob[:] = 0.0
 
         # loop over all elements

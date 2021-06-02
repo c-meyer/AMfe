@@ -32,9 +32,9 @@ class TestConstraintTools(TestCase):
         self.assertAlmostEqual(actual_2, desired_2)
 
     def test_validate_constraints_independent(self):
-        B_independent = np.array([[1, 0, 0], [1, 1, 0]], dtype=float)
-        B_dependent = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 1, 0, 0]], dtype=float)
-        B_dependent_tol = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 1, 1e-5, 0]], dtype=float)
+        B_independent = np.array([[1, 0, 0], [1, 1, 0]], dtype=np.float64)
+        B_dependent = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 1, 0, 0]], dtype=np.float64)
+        B_dependent_tol = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 1, 1e-5, 0]], dtype=np.float64)
 
         actual_independent = validate_constraints_independent(B_independent)
         actual_dependent = validate_constraints_independent(B_dependent)
@@ -120,9 +120,9 @@ class TestDirichletConstraint(TestCase):
         self.constraint_1 = DirichletConstraint(U=lambda t: 0, dU=lambda t: 0, ddU=lambda t: 0)
         self.constraint_2 = DirichletConstraint(U=lambda t: t ** 2, dU=lambda t: 3 * t, ddU=lambda t: 2)
         # set parameters:
-        self.X_local = np.array([5.0, 6.0, 7.0, 8.0], dtype=float)
-        self.u_local = np.array([0.1, 0.04, 0.02, 0.01], dtype=float)
-        self.du_local = np.array([0.0, 0.0, 0.1, 0.2], dtype=float)
+        self.X_local = np.array([5.0, 6.0, 7.0, 8.0], dtype=np.float64)
+        self.u_local = np.array([0.1, 0.04, 0.02, 0.01], dtype=np.float64)
+        self.du_local = np.array([0.0, 0.0, 0.1, 0.2], dtype=np.float64)
         self.t = 2
 
     def tearDown(self):
@@ -130,8 +130,8 @@ class TestDirichletConstraint(TestCase):
 
     def test_constraint_func(self):
         # test constraint-functions
-        constraint_desired_1 = np.array([0.1, 0.04, 0.02, 0.01], dtype=float)
-        constraint_desired_2 = np.array([-3.9, -3.96, -3.98, -3.99], dtype=float)
+        constraint_desired_1 = np.array([0.1, 0.04, 0.02, 0.01], dtype=np.float64)
+        constraint_desired_2 = np.array([-3.9, -3.96, -3.98, -3.99], dtype=np.float64)
         for X, u, desired_1, desired_2 in zip(self.X_local, self.u_local,
                                               constraint_desired_1, constraint_desired_2):
             constraint_1 = self.constraint_1.g(X, u, self.t)
@@ -143,7 +143,7 @@ class TestDirichletConstraint(TestCase):
 
     def test_jacobian(self):
         # test jacobians
-        B_desired = np.array([1], dtype=float)
+        B_desired = np.array([1], dtype=np.float64)
 
         for X, u, in zip(self.X_local, self.u_local):
             B_1 = self.constraint_1.B(X, u, self.t)
@@ -152,7 +152,7 @@ class TestDirichletConstraint(TestCase):
             assert_array_equal(B_2, B_desired)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         for X, u, in zip(self.X_local, self.u_local):
             B_1 = self.constraint_1.B(X, u, self.t)
             B_2 = self.constraint_2.B(X, u, self.t)
@@ -162,7 +162,7 @@ class TestDirichletConstraint(TestCase):
             assert_allclose(B_2*self.dU2(self.t) + b_2, b_desired)
 
     def test_a(self):
-        a_desired = np.array([0], dtype=float)
+        a_desired = np.array([0], dtype=np.float64)
         for X, u, in zip(self.X_local, self.u_local):
             B_1 = self.constraint_1.B(X, u, self.t)
             B_2 = self.constraint_2.B(X, u, self.t)
@@ -176,11 +176,11 @@ class TestFixedDistanceConstraint(TestCase):
     def setUp(self):
         self.dofs = 4
         # set parameters:
-        self.X_local = np.array([5.0, 6.0, 7.0, 8.0], dtype=float)
-        self.u_local_1 = np.array([0.1, 0.02, 0.1, 0.02], dtype=float)
-        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0], dtype=float)
-        self.u_local_3 = np.array([0.0, 0.0, -2.0, 0.0], dtype=float)
-        self.du_local = np.array([0.0, 0.0, 0.1, 0.2], dtype=float)
+        self.X_local = np.array([5.0, 6.0, 7.0, 8.0], dtype=np.float64)
+        self.u_local_1 = np.array([0.1, 0.02, 0.1, 0.02], dtype=np.float64)
+        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+        self.u_local_3 = np.array([0.0, 0.0, -2.0, 0.0], dtype=np.float64)
+        self.du_local = np.array([0.0, 0.0, 0.1, 0.2], dtype=np.float64)
         self.t = 2
 
         self.constraint_1 = FixedDistanceConstraint()
@@ -192,12 +192,12 @@ class TestFixedDistanceConstraint(TestCase):
         # test constraint-functions
         constraint_1 = self.constraint_1.g(self.X_local, self.u_local_1,
                                            self.t)
-        constraint_desired_1 = np.array(0.0, dtype=float)
+        constraint_desired_1 = np.array(0.0, dtype=np.float64)
         assert_array_equal(constraint_desired_1, constraint_1)
 
         constraint_2 = self.constraint_1.g(self.X_local, self.u_local_2,
                                            self.t)
-        constraint_desired_2 = np.array(0.0, dtype=float)
+        constraint_desired_2 = np.array(0.0, dtype=np.float64)
         assert_array_equal(constraint_desired_2, constraint_2)
 
         constraint_3 = self.constraint_1.g(self.X_local, self.u_local_3,
@@ -227,14 +227,14 @@ class TestFixedDistanceConstraint(TestCase):
         assert_allclose(J_u_2, J_u_desired_2.T)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         B_1 = self.constraint_1.B(self.X_local, self.u_local_1, self.t)
         b_1 = self.constraint_1.b(self.X_local, self.u_local_1, self.t)
         # Check if a rotation of the second node around the first node returns zero
         assert_allclose(B_1.dot(np.array([0.0, 0.0, -1.0, 1.0])) + b_1, b_desired)
 
     def test_a(self):
-        a_desired = np.array([0], dtype=float)
+        a_desired = np.array([0], dtype=np.float64)
         velocity = np.array([0.0, 0.0, -1.0, 1.0])
         B_1 = self.constraint_1.B(self.X_local, self.u_local_2, self.t)
         a_1 = self.constraint_1.a(self.X_local, self.u_local_2, velocity, self.t)
@@ -263,11 +263,11 @@ class TestFixedDistanceToLineConstraint(TestCase):
         """
         self.dofs = 9
         # set parameters:
-        self.X_local = np.array([0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0, 0.0], dtype=float)
+        self.X_local = np.array([0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0, 0.0], dtype=np.float64)
         # shift line to right
         self.u_local_1 = np.array([1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         # zero
-        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         # turn point around line:
         self.u_local_3 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 1.0])
         # Turn line and point
@@ -275,7 +275,7 @@ class TestFixedDistanceToLineConstraint(TestCase):
         # violated constraint
         self.u_local_5 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.1, 0.0])
 
-        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         self.t = 2
 
         self.constraint_1 = FixedDistanceToLineConstraint()
@@ -285,7 +285,7 @@ class TestFixedDistanceToLineConstraint(TestCase):
 
     def test_constraint_func_zero(self):
         # test constraint-functions
-        constraint_desired = np.array(0.0, dtype=float)
+        constraint_desired = np.array(0.0, dtype=np.float64)
 
         constraint_1 = self.constraint_1.g(self.X_local, self.u_local_1,
                                            self.t)
@@ -331,7 +331,7 @@ class TestFixedDistanceToLineConstraint(TestCase):
         assert_allclose(J_u_2, J_u_desired_2.T, atol=1e-9)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         B_1 = self.constraint_1.B(self.X_local, self.u_local_1, self.t)
         b_1 = self.constraint_1.b(self.X_local, self.u_local_1, self.t)
         # Check if a rotation of the node around the line returns zero
@@ -359,11 +359,11 @@ class TestNodesCollinear2DConstraint(TestCase):
         """
         self.dofs = 6
         # set parameters:
-        self.X_local = np.array([0.0, 0.0, 2.0, 0.0, 1.0, 0.0], dtype=float)
+        self.X_local = np.array([0.0, 0.0, 2.0, 0.0, 1.0, 0.0], dtype=np.float64)
         # shift line to right
         self.u_local_1 = np.array([1.0, 0.0, 1.0, 0.0, 0.0, 0.0])
         # zero
-        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         # move point along line
         self.u_local_3 = np.array([0.0, 0.0, 0.0, 0.0, 100.0, 0.0])
         # Turn line and point
@@ -371,7 +371,7 @@ class TestNodesCollinear2DConstraint(TestCase):
         # violated constraint
         self.u_local_5 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, -0.1])
 
-        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         self.t = 2
 
         self.constraint_1 = NodesCollinear2DConstraint()
@@ -381,7 +381,7 @@ class TestNodesCollinear2DConstraint(TestCase):
 
     def test_constraint_func_zero(self):
         # test constraint-functions
-        constraint_desired = np.array(0.0, dtype=float)
+        constraint_desired = np.array(0.0, dtype=np.float64)
 
         constraint_1 = self.constraint_1.g(self.X_local, self.u_local_1,
                                            self.t)
@@ -427,7 +427,7 @@ class TestNodesCollinear2DConstraint(TestCase):
         assert_allclose(J_u_2, J_u_desired_2.T, atol=1e-9)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         B_1 = self.constraint_1.B(self.X_local, self.u_local_1, self.t)
         b_1 = self.constraint_1.b(self.X_local, self.u_local_1, self.t)
         # Check if constraint returns zero if node moves along line
@@ -456,15 +456,15 @@ class TestEqualDisplacementConstraint(TestCase):
         """
         self.dofs = 2
         # set parameters:
-        self.X_local = np.array([], dtype=float)
+        self.X_local = np.array([], dtype=np.float64)
         # shift to right
         self.u_local_1 = np.array([1.0, 1.0])
         # zero
-        self.u_local_2 = np.array([0.0, 0.0], dtype=float)
+        self.u_local_2 = np.array([0.0, 0.0], dtype=np.float64)
         # violated constraint
         self.u_local_3 = np.array([1.0, 3.0])
 
-        self.du_local = np.array([0.0, 0.0], dtype=float)
+        self.du_local = np.array([0.0, 0.0], dtype=np.float64)
         self.t = 2
 
         self.constraint_1 = EqualDisplacementConstraint()
@@ -474,7 +474,7 @@ class TestEqualDisplacementConstraint(TestCase):
 
     def test_constraint_func_zero(self):
         # test constraint-functions
-        constraint_desired = np.array(0.0, dtype=float)
+        constraint_desired = np.array(0.0, dtype=np.float64)
 
         constraint_1 = self.constraint_1.g(self.X_local, self.u_local_1,
                                            self.t)
@@ -511,7 +511,7 @@ class TestEqualDisplacementConstraint(TestCase):
         assert_allclose(J_u_2, J_u_desired_2.T, atol=1e-9)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         B_1 = self.constraint_1.B(self.X_local, self.u_local_1, self.t)
         b_1 = self.constraint_1.b(self.X_local, self.u_local_1, self.t)
         # Check if constraint returns zero if node moves along line
@@ -542,11 +542,11 @@ class TestFixedDistanceToPlaneConstraint(TestCase):
         """
         self.dofs = 12
         # set parameters:
-        self.X_local = np.array([0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0, 0.0, 0.0, 0.0, 5.0], dtype=float)
+        self.X_local = np.array([0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0, 0.0, 0.0, 0.0, 5.0], dtype=np.float64)
         # shift bottom line to right
         self.u_local_1 = np.array([1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         # zero
-        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         # turn plane such that it is a yz-plane
         self.u_local_3 = np.array([0.0, 0.0, 0.0, -2.0, -2.0, 0.0, -2.0, -1.0, 1.0, -5.0, 0.0, -5.0])
         # Move point parallel to plane
@@ -554,7 +554,7 @@ class TestFixedDistanceToPlaneConstraint(TestCase):
         # violated constraint
         self.u_local_5 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.1])
 
-        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         self.t = 2
 
         self.constraint_1 = FixedDistanceToPlaneConstraint()
@@ -564,7 +564,7 @@ class TestFixedDistanceToPlaneConstraint(TestCase):
 
     def test_constraint_func_zero(self):
         # test constraint-functions
-        constraint_desired = np.array(0.0, dtype=float)
+        constraint_desired = np.array(0.0, dtype=np.float64)
 
         constraint_1 = self.constraint_1.g(self.X_local, self.u_local_1,
                                            self.t)
@@ -610,7 +610,7 @@ class TestFixedDistanceToPlaneConstraint(TestCase):
         assert_allclose(J_u_2, J_u_desired_2.T, atol=1e-9)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         B_1 = self.constraint_1.B(self.X_local, self.u_local_1, self.t)
         b_1 = self.constraint_1.b(self.X_local, self.u_local_1, self.t)
         # Check if a move with same distance leads to zero
@@ -641,11 +641,11 @@ class TestNodesCoplanarConstraint(TestCase):
         """
         self.dofs = 12
         # set parameters:
-        self.X_local = np.array([0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0, 0.0, 1.0, 0.5, 0.0], dtype=float)
+        self.X_local = np.array([0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0, 0.0, 1.0, 0.5, 0.0], dtype=np.float64)
         # shift bottom line to right
         self.u_local_1 = np.array([1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         # zero
-        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.u_local_2 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         # turn plane such that it is a yz-plane
         self.u_local_3 = np.array([0.0, 0.0, 0.0, -2.0, -2.0, 0.0, -2.0, -1.0, 1.0, -1.0, -0.5, 0.5])
         # Move point parallel to plane
@@ -653,7 +653,7 @@ class TestNodesCoplanarConstraint(TestCase):
         # violated constraint
         self.u_local_5 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.1])
 
-        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=float)
+        self.du_local = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float64)
         self.t = 2
 
         self.constraint_1 = NodesCoplanarConstraint()
@@ -663,7 +663,7 @@ class TestNodesCoplanarConstraint(TestCase):
 
     def test_constraint_func_zero(self):
         # test constraint-functions
-        constraint_desired = np.array(0.0, dtype=float)
+        constraint_desired = np.array(0.0, dtype=np.float64)
 
         constraint_1 = self.constraint_1.g(self.X_local, self.u_local_1,
                                            self.t)
@@ -709,7 +709,7 @@ class TestNodesCoplanarConstraint(TestCase):
         assert_allclose(J_u_2, J_u_desired_2.T, atol=1e-9)
 
     def test_b(self):
-        b_desired = np.array([0], dtype=float)
+        b_desired = np.array([0], dtype=np.float64)
         B_1 = self.constraint_1.B(self.X_local, self.u_local_1, self.t)
         b_1 = self.constraint_1.b(self.X_local, self.u_local_1, self.t)
         # Check if a the move of all points inside plane returns zero

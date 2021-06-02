@@ -31,17 +31,17 @@ def jacobian(func, X, u, t):
     return jac
 
 
-X_linear_beam = np.array([0, 0, 0, 2, 1, 0], dtype=float)
-X_tri3 = np.array([0,0,3,1,2,2], dtype=float)
-X_tri6 = np.array([0,0,3,1,2,2,1.5,0.5,2.5,1.5,1,1], dtype=float)
-X_quad4 = np.array([0,0,1,0,1,1,0,1], dtype=float)
-X_quad8 = np.array([0,0,1,0,1,1,0,1,0.5,0,1,0.5,0.5,1,0,0.5], dtype=float)
-X_tet4 = np.array([0, 0, 0,  1, 0, 0,  0, 1, 0,  0, 0, 1], dtype=float)
+X_linear_beam = np.array([0, 0, 0, 2, 1, 0], dtype=np.float64)
+X_tri3 = np.array([0,0,3,1,2,2], dtype=np.float64)
+X_tri6 = np.array([0,0,3,1,2,2,1.5,0.5,2.5,1.5,1,1], dtype=np.float64)
+X_quad4 = np.array([0,0,1,0,1,1,0,1], dtype=np.float64)
+X_quad8 = np.array([0,0,1,0,1,1,0,1,0.5,0,1,0.5,0.5,1,0,0.5], dtype=np.float64)
+X_tet4 = np.array([0, 0, 0,  1, 0, 0,  0, 1, 0,  0, 0, 1], dtype=np.float64)
 X_tet10 = np.array([0.,  0.,  0.,  2.,  0.,  0.,  0.,  2.,  0.,  0.,  0.,  2.,  1.,
                     0.,  0.,  1.,  1.,  0.,  0.,  1.,  0.,  0.,  0.,  1.,  1.,  0.,
                     1.,  0.,  1.,  1.])
 X_hexa8 = np.array([0,0,0, 1,0,0, 1,1,0, 0,1,0, 0,0,1, 1,0,1, 1,1,1, 0,1,1],
-                   dtype=float)
+                   dtype=np.float64)
 X_hexa20  = np.array(
       [ 0. ,  0. ,  0. ,  1. ,  0. ,  0. ,  1. ,  1. ,  0. ,  0. ,  1. ,
         0. ,  0. ,  0. ,  1. ,  1. ,  0. ,  1. ,  1. ,  1. ,  1. ,  0. ,
@@ -308,7 +308,7 @@ class BoundaryElementTest(unittest.TestCase):
         pass
 
     def test_tri3_pressure(self):
-        X = np.array([0, 0, 0, 1, 0, 0, 0, 1, 0], dtype=float)
+        X = np.array([0, 0, 0, 1, 0, 0, 0, 1, 0], dtype=np.float64)
         u = np.zeros_like(X)
         f_mat_desired = np.array([[0, 0, -1/6], [0, 0, -1/6], [0, 0, -1/6]])
         my_press_ele = Tri3Boundary()
@@ -316,9 +316,9 @@ class BoundaryElementTest(unittest.TestCase):
         np.testing.assert_allclose(f_mat, f_mat_desired, rtol=1E-6, atol=1E-7)
 
     def test_line_pressure(self):
-        X = np.array([0, 0, 1, 1], dtype=float)
+        X = np.array([0, 0, 1, 1], dtype=np.float64)
         u = X
-        f_mat_desired = np.array([[1, -1], [1, -1]], dtype=float)
+        f_mat_desired = np.array([[1, -1], [1, -1]], dtype=np.float64)
         my_press_ele = LineLinearBoundary()
         f_mat = my_press_ele.f_mat(X, u)
         np.testing.assert_allclose(f_mat, f_mat_desired, rtol=1E-6, atol=1E-7)

@@ -103,5 +103,5 @@ class StandardMapping(MappingBase):
                 else:
                     raise ValueError('Doftype must be E or N')
             # Get global dof numbers of element
-            self._elements2global.at[index, 'global_dofs'] = np.array(global_dofs_for_element, dtype=int)
+            self._elements2global.at[index, 'global_dofs'] = np.array(global_dofs_for_element, dtype=np.intp)
             callback(index, callbackarg)

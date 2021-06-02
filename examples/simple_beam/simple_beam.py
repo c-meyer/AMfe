@@ -41,7 +41,7 @@ my_neumann = FixedDirectionNeumann(np.array([0, 1]), time_func = lambda t: 2)
 my_component.assign_neumann('Neumann0', my_neumann, ['right_boundary'], '_groups')
 
 my_constraint = my_component.constraints.create_dirichlet_constraint()
-fixed_nodeids = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=int)
+fixed_nodeids = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], dtype=np.intp)
 my_component.assign_constraint('Dirichlet0', my_constraint, fixed_nodeids, '_nodeids', 'elim')
 
 

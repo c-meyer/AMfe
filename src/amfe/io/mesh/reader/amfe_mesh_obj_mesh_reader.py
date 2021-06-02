@@ -75,10 +75,10 @@ class AmfeMeshObjMeshReader(MeshReader):
             tagsdict = dict()
             default = None
             dtype = object
-            for d in [int, np.int, pd.Int64Dtype(), pd.Int32Dtype()]:
+            for d in [int, np.intp, np.int32, np.int64, pd.Int64Dtype(), pd.Int32Dtype()]:
                 if d == dfcol.dtype:
                     dtype = int
-            if dfcol.dtype in [float, np.float]:
+            if dfcol.dtype in [float, np.float32, np.float64]:
                 dtype = float
             for uniquevalue in uniquevalues:
                 if pd.isna(uniquevalue):

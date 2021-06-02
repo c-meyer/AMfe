@@ -24,9 +24,9 @@ class NeumannManager:
         # Dataframe containing element_objects and their position in connectivity array and their
         # foreign key to the _neumann_df they belong to
         self._neumann_obj_df = pd.DataFrame(columns=['neumann_obj', 'fk_mesh', 'fk_neumann_df', 'fk_mapping'])
-        self._neumann_obj_df['fk_neumann_df'] = self._neumann_obj_df['fk_neumann_df'].astype(int)
-        self._neumann_obj_df['fk_mesh'] = self._neumann_obj_df['fk_mesh'].astype(int)
-        self._neumann_obj_df['fk_mapping'] = self._neumann_obj_df['fk_mapping'].astype(int)
+        self._neumann_obj_df['fk_neumann_df'] = self._neumann_obj_df['fk_neumann_df'].astype(np.intp)
+        self._neumann_obj_df['fk_mesh'] = self._neumann_obj_df['fk_mesh'].astype(np.intp)
+        self._neumann_obj_df['fk_mapping'] = self._neumann_obj_df['fk_mapping'].astype(np.intp)
 
     def __str__(self):
         """
@@ -75,8 +75,8 @@ class NeumannManager:
         # Create new rows for neumann_obj_df
         df = pd.DataFrame(
             {'neumann_obj': neumann_objects, 'fk_mesh': eleidxes,
-             'fk_neumann_df': np.ones(len(neumann_objects), dtype=int) * dfindex,
-             'fk_mapping': -1*np.ones(len(neumann_objects), dtype=int)}
+             'fk_neumann_df': np.ones(len(neumann_objects), dtype=np.intp) * dfindex,
+             'fk_mapping': -1*np.ones(len(neumann_objects), dtype=np.intp)}
         )
         self._neumann_obj_df = self._neumann_obj_df.append(df, ignore_index=True, verify_integrity=True)
 
@@ -124,7 +124,7 @@ class NeumannManager:
 
     @staticmethod
     def create_fixed_direction_neumann(direction, time_func=lambda t: 1):
-        direction = np.array(direction, dtype=float)
+        direction = np.array(direction, dtype=np.float64)
         return FixedDirectionNeumann(direction, time_func)
 
     @staticmethod
@@ -133,5 +133,5 @@ class NeumannManager:
 
     @staticmethod
     def create_projected_area_neumann(direction, time_func=lambda t: 1):
-        direction = np.array(direction, dtype=float)
+        direction = np.array(direction, dtype=np.float64)
         return ProjectedAreaNeumann(direction, time_func)

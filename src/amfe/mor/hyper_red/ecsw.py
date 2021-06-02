@@ -159,7 +159,7 @@ def ecsw_assemble_G_and_b(component, S, W, timesteps=None):
     logger = logging.getLogger('amfe.hyper_red.ecsw.ecsw_assemble_G_and_b')
 
     if timesteps is None:
-        timesteps = np.zeros(S.shape[1], dtype=float)
+        timesteps = np.zeros(S.shape[1], dtype=np.float64)
 
     no_of_dofs, no_of_snapshots = S.shape
     no_of_reduced_dofs = W.shape[1]
@@ -231,7 +231,7 @@ def ecsw_get_weights_by_component(component, S, W, timesteps=None, tau=0.001, co
     """
 
     if timesteps is None:
-        timesteps = np.zeros(S.shape[1], dtype=float)
+        timesteps = np.zeros(S.shape[1], dtype=np.float64)
 
     # Create G and b from snapshots:
     G, b = ecsw_assemble_G_and_b(component, S, W, timesteps)

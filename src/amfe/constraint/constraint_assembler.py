@@ -25,9 +25,9 @@ class ConstraintAssembler:
         ----------
         no_of_dofs_unconstrained : int
             number of dofs of the unconstrained system (number of columns of B)
-        dofs_by_object : list of ndarrays with dtype int
+        dofs_by_object : list of ndarrays with dtype np.intp
             list containing indices (position based) of dofs that are concerned by constraints
-            dofs[i] = np.array([dof1, dof2, ...], dtype=int)
+            dofs[i] = np.array([dof1, dof2, ...], dtype=np.intp)
             where dof1, dof2,... are all dofs that are concerned by the i-th constraint
         no_of_constraints_by_object : tuple
             containing the number of constraints by later passed constraint object
@@ -89,7 +89,7 @@ class ConstraintAssembler:
         jacobians : list
             list of function handles that return the local B for each constraint
         dofs : list
-            list of ndarrays (dtype int) containing the indices of the dofs that are passed to the B functions
+            list of ndarrays (dtype np.intp) containing the indices of the dofs that are passed to the B functions
         args : list
             list of full global arrays whose local coordinates needs to be passed to the jacobians
         B : csr_matrix
@@ -147,7 +147,7 @@ class ConstraintAssembler:
         jacobians : list
             list of function handles that return the local B for each constraint
         dofs : list
-            list of ndarrays (dtype int) containing the indices of the dofs that are passed to the B functions
+            list of ndarrays (dtype np.intp) containing the indices of the dofs that are passed to the B functions
         args : list
             list of full global arrays whose local coordinates needs to be passed to the jacobians
         B : csr_matrix

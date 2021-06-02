@@ -34,8 +34,8 @@ studies.append('full_ti')
 Omega = 31.0
 
 times = dict([])
-input_file = amfe_dir('meshes/gmsh/bar.msh')
-output_file = amfe_dir('results/beam_nonlinear_refactoring/beam_ecsw')
+input_file = amfe_dir('../meshes/gmsh/bar.msh')
+output_file = amfe_dir('../results/beam_nonlinear_refactoring/beam_ecsw')
 
 # Define material
 material = KirchhoffMaterial(E=210E9, nu=0.3, rho=1E4, plane_stress=True)
@@ -48,7 +48,7 @@ component.assign_material(material, [7], 'S')
 # Assign Dirichlet Boundaries
 set_dirichlet_by_group(component, 8, ('ux', 'uy'))
 # Assign Neumann Boundaries
-force = component.neumann.create_fixed_direction_neumann(np.array([0, -1], dtype=float),
+force = component.neumann.create_fixed_direction_neumann(np.array([0, -1], dtype=np.float64),
                                                          lambda t: 1E8*np.sin(Omega*t))
 component.assign_neumann('Force', force, [9])
 

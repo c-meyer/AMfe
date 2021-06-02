@@ -143,8 +143,8 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
                 # this is why whe have set el_df['isource'] = None by default and then overwrote them at loc[index]
                 # with an ascending enumeration)
                 el_df_current_etype_not_nan = el_df_current_etype.loc[pd.notna(el_df_current_etype['isource']), ['igoal','isource']]
-                isource = el_df_current_etype_not_nan['isource'].values.astype(int)
-                igoal = el_df_current_etype_not_nan['igoal'].values.astype(int)
+                isource = el_df_current_etype_not_nan['isource'].values.astype(np.intp)
+                igoal = el_df_current_etype_not_nan['igoal'].values.astype(np.intp)
 
                 # Write the data of data array at the right places
                 if field_type == PostProcessDataType.SCALAR and data.ndim == 1:
@@ -159,7 +159,7 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
         # -- PROCEDURE FOR NODE DATA --
         else:
             # Get the ilocs of the given index for nodes
-            nodesiloc = self._mesh_container['nodes'].loc[index, 'iloc'].values.astype(int)
+            nodesiloc = self._mesh_container['nodes'].loc[index, 'iloc'].values.astype(np.intp)
             # if vector than change the nodesiloc such because vector has 3 following elements in data array
             if field_type == PostProcessDataType.VECTOR:
                 data[nodesiloc, :, :] = data[:, :, :]

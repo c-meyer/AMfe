@@ -10,14 +10,14 @@ from amfe.constraint.constraint_formulation_nullspace_elimination import Nullspa
 
 class TestNullspaceConstraintFormulation(TestCase):
     def setUp(self):
-        M_mat = np.array([[1, -1, 0], [-1, 1.2, -1.5], [0, -1.5, 2]], dtype=float)
-        K_mat = np.array([[2, -1, 0], [-1, 2, -1.5], [0, -1.5, 3]], dtype=float)
+        M_mat = np.array([[1, -1, 0], [-1, 1.2, -1.5], [0, -1.5, 2]], dtype=np.float64)
+        K_mat = np.array([[2, -1, 0], [-1, 2, -1.5], [0, -1.5, 3]], dtype=np.float64)
         D_mat = 0.2 * M_mat + 0.1 * K_mat
 
         self.M_unconstr = csr_matrix(M_mat)
         self.D_unconstr = csr_matrix(D_mat)
         self.K_unconstr = csr_matrix(K_mat)
-        self.f_int_unconstr = np.array([1, 2, 3], dtype=float)
+        self.f_int_unconstr = np.array([1, 2, 3], dtype=np.float64)
         self.f_ext_unconstr = np.array([3, 4, 5], dtype=float)
 
         def M(u, du, t):
