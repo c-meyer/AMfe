@@ -38,12 +38,15 @@ amfe.mapping improvements
 
 amfe.mor improvements
 ---------------------
+- The reduction basis updating algorithms are moved to this module.
 
 amfe.neumann improvements
 -------------------------
 
 amfe.parametric improvements
 ----------------------------
+- This module has been removed. You can find mesh morphing techniques in the new package ammorph.
+- The Reduction basis updating algorithms are moved to mor submodule.
 
 amfe.solver improvements
 ------------------------

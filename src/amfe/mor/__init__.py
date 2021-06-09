@@ -11,6 +11,7 @@ Model Reduction Module
 
 # -- Reduction Bases
 from .reduction_basis import *
+from .basis_updating import *
 from .ui import *
 # -- import subfolder
 from .hyper_red import *
