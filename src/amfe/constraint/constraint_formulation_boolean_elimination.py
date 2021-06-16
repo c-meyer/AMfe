@@ -89,7 +89,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         """
         # Boolean elimination assumes that C is constant (scleronomic) and independent on q!
         # Thus, C is called by just calling for any arbitrary values, q and t
-        q = np.zeros(self._no_of_dofs_unconstrained, dtype=float)
+        q = np.zeros(self._no_of_dofs_unconstrained, dtype=np.float64)
         t = 0.0
         B = self._B_func(q, t)
         constrained_dofs = self._get_constrained_dofs_by_B(B)
@@ -243,7 +243,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
             recovered displacements of the unconstrained system
 
         """
-        return np.array([], ndmin=1, dtype=float)
+        return np.array([], ndmin=1, dtype=np.float64)
 
     def M(self, x, dx, t):
         r"""

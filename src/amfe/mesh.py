@@ -78,9 +78,9 @@ class Mesh:
         # -- NODE INFORMATION --
         if dimension == 3:
             self.nodes_df = pd.DataFrame(columns=('x', 'y', 'z'),
-                                         dtype='float')
+                                         dtype=np.float64)
         elif dimension == 2:
-            self.nodes_df = pd.DataFrame(columns=('x', 'y'), dtype='float')
+            self.nodes_df = pd.DataFrame(columns=('x', 'y'), dtype=np.float64)
         else:
             raise ValueError('Mesh dimension must be 2 or 3')
 
@@ -284,7 +284,7 @@ class Mesh:
             indices of the elements in the connectivity array
         """
         elementids = self.get_elementids_by_groups(groups)
-        return np.array([self._el_df.index.get_loc(elementid) for elementid in elementids], dtype=int)
+        return np.array([self._el_df.index.get_loc(elementid) for elementid in elementids], dtype=np.intp)
 
     def get_elementids_by_groups(self, groups):
         """
@@ -322,7 +322,7 @@ class Mesh:
         -------
             indices of the elements in the connectivity array
         """
-        return np.array([self._el_df.index.get_loc(elementid) for elementid in elementids], dtype=int)
+        return np.array([self._el_df.index.get_loc(elementid) for elementid in elementids], dtype=np.intp)
 
     def get_elementids_by_elementidxs(self, elementidxs):
         """
@@ -353,7 +353,7 @@ class Mesh:
         eleids : ndarray
             elementids, that belong to the node
         """
-        #eleids = np.array([], dtype=int)
+        #eleids = np.array([], dtype=np.intp)
         #for element_id in self.element_ids:
 #            connectivity = self.get_connectivity_by_elementids(np.array([element_id]))
 #            for nodeid in nodeids:
@@ -417,7 +417,7 @@ class Mesh:
             ndarray the nodeids that fulfill the condition
         """
         nodeids = self.nodes_df.index[((self.nodes_df['x'] - x).abs() - epsilon) <= 0].tolist()
-        return np.array(nodeids, dtype=int)
+        return np.array(nodeids, dtype=np.intp)
 
     def get_nodeids_by_lesser_equal_x_coordinates(self, x, epsilon):
         """
@@ -434,7 +434,7 @@ class Mesh:
             ndarray the nodeids that fulfill the condition
         """
         nodeids = self.nodes_df.index[(self.nodes_df['x'] - (x + epsilon)) <= 0].tolist()
-        return np.array(nodeids, dtype=int)
+        return np.array(nodeids, dtype=np.intp)
 
     def get_nodeids_by_greater_equal_x_coordinates(self, x, epsilon):
         """
@@ -451,7 +451,7 @@ class Mesh:
             ndarray the nodeids that fulfill the condition
         """
         nodeids = self.nodes_df.index[(self.nodes_df['x'] - (x - epsilon)) >= 0].tolist()
-        return np.array(nodeids, dtype=int)
+        return np.array(nodeids, dtype=np.intp)
 
     def get_nodeids_by_groups(self, groups):
         """
@@ -471,7 +471,7 @@ class Mesh:
         nodeids_from_nodes = []
         for group in groups:
             nodeids_from_nodes.extend(self.groups[group]['nodes'])
-        nodeids_from_nodes = np.array(nodeids_from_nodes, dtype=int)
+        nodeids_from_nodes = np.array(nodeids_from_nodes, dtype=np.intp)
 
         # Get Nodids from nodes which belong the elements of the group
         elementids = self.get_elementids_by_groups(groups)
@@ -497,7 +497,7 @@ class Mesh:
         if not isinstance(elementids, Iterable):
             elementids = [elementids]
         if len(elementids) == 0:
-            return np.array([], dtype=int)
+            return np.array([], dtype=np.intp)
         nodeids = np.hstack(self.get_connectivity_by_elementids(elementids))
         nodeids = np.unique(nodeids)
         return nodeids
@@ -581,7 +581,7 @@ class Mesh:
         nodeidxs : ndarray
             returns all nodeidxs
         """
-        return np.arange(self.no_of_nodes, dtype=np.int)
+        return np.arange(self.no_of_nodes, dtype=np.intp)
     
     def get_nodeidxs_by_nodeids(self, nodeids):
         """
@@ -595,7 +595,7 @@ class Mesh:
         nodeidxs: ndarray
             rowindices of nodes in nodes dataframe
         """
-        nodeidxs = np.array([self.nodes_df.index.get_loc(nodeid) for nodeid in nodeids], dtype=int)
+        nodeidxs = np.array([self.nodes_df.index.get_loc(nodeid) for nodeid in nodeids], dtype=np.intp)
         return nodeidxs
 
     def get_nodeids_by_nodeidxs(self, nodeidxs):
@@ -795,7 +795,7 @@ class Mesh:
         """
         
         rows = self.get_elementids_by_tags(tag_names, tag_values, opt_larger)
-        return np.array([self._el_df.index.get_loc(row) for row in rows], dtype=int)
+        return np.array([self._el_df.index.get_loc(row) for row in rows], dtype=np.intp)
     
     def get_uniques_by_tag(self, tag):
         """
@@ -1066,16 +1066,16 @@ class Mesh:
 
         try:
             dtype = node_coordinates.dtype
-            if dtype != np.float:
+            if dtype != np.float64:
                 node_coordinates = node_coordinates.astype(float)
         except AttributeError:
             if isinstance(node_coordinates, dict):
                 if self.dimension == 2:
                     if 'z' in node_coordinates:
-                        node_coordinates = np.array([node_coordinates['x'], node_coordinates['y']], dtype=float)
+                        node_coordinates = np.array([node_coordinates['x'], node_coordinates['y']], dtype=np.float64)
                 elif self.dimension == 3:
                     node_coordinates = np.array([node_coordinates['x'], node_coordinates['y'], node_coordinates['z']],
-                                                dtype=float)
+                                                dtype=np.float64)
                 else:
                     raise NotImplementedError('The mesh is only implemented for 2 or 3 dimensional topologies')
 
@@ -1102,7 +1102,7 @@ class Mesh:
             Element shape of the new element. Can be
 
         connectivity: numpy.array
-            numpy array with dtype integer, defining the connectivity of the element. It references the node ids
+            numpy array with dtype np.intp, defining the connectivity of the element. It references the node ids
             in the right order for the given shape
         element_id: int, optional
             ID of the element, If None is given (default) the class takes the first free value for the index
@@ -1114,13 +1114,13 @@ class Mesh:
         index: int
             The new index of the element that has been added
         """
-        # Check if connectivity is numpy array dtype int otherwise convert to this data type
+        # Check if connectivity is numpy array dtype np.intp otherwise convert to this data type
         try:
             dtype = connectivity.dtype
-            if dtype != np.int:
-                connectivity = connectivity.astype(int)
+            if dtype != np.intp:
+                connectivity = connectivity.astype(np.intp)
         except AttributeError:
-            connectivity = np.array(connectivity).astype(int)
+            connectivity = np.array(connectivity).astype(np.intp)
 
         # Check shapes
         if shape not in SHAPES:

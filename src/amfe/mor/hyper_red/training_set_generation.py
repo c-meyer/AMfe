@@ -151,7 +151,7 @@ def compute_nskts(K, M, F_ext_max, f_int_func, K_func,
 #            u_list.append(u)
 # NON PARALLEL IMPLEMENTATION
     u_list = []
-    u_out = np.zeros((ndim, no_of_force_increments), dtype=float)
+    u_out = np.zeros((ndim, no_of_force_increments), dtype=np.float64)
     for i in range(no_of_static_cases):
         F_rand = F_basis @ np.random.normal(0, standard_deviation)
         u_out[:, :] = 0.0

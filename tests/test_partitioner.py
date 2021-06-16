@@ -65,14 +65,15 @@ class TestPartitioner(TestCase):
                                     1---2---5    5---8
         '''
         nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [2.0, 0.0], [2.0, 1.0], [3.0, 1.0],
-                          [3.0, 0.0], [0.0, 2.0], [1.0, 2.0], [2.0, 2.0], [3.0, 2.0]], dtype=np.float)
-        connectivity = [np.array([5, 6, 3], dtype=np.int), np.array([3, 2, 5], dtype=np.int),
-                        np.array([1, 2, 3, 4], dtype=np.int), np.array([5, 7, 8], dtype=np.int),
-                        np.array([6, 7, 5], dtype=np.int), np.array([3, 4, 9, 10], dtype=np.int),
-                        np.array([6, 7, 11, 12], dtype=np.int), np.array([3, 6, 10, 11], dtype=np.int),
+                          [3.0, 0.0], [0.0, 2.0], [1.0, 2.0], [2.0, 2.0], [3.0, 2.0]], dtype=np.float64)
+        connectivity = [np.array([5, 6, 3], dtype=np.intp), np.array([3, 2, 5], dtype=np.intp),
+                        np.array([1, 2, 3, 4], dtype=np.intp), np.array([5, 7, 8], dtype=np.intp),
+                        np.array([6, 7, 5], dtype=np.intp), np.array([3, 4, 9, 10], dtype=np.intp),
+                        np.array([6, 7, 11, 12], dtype=np.intp), np.array([3, 6, 10, 11], dtype=np.intp),
                         # boundary elements
-                        np.array([4, 1], dtype=np.int), np.array([4, 9], dtype=np.int), np.array([7, 8], dtype=np.int),
-                        np.array([7, 12], dtype=np.int)]
+                        np.array([4, 1], dtype=np.intp), np.array([4, 9], dtype=np.intp), np.array([7, 8],
+                                                                                                     dtype=np.intp),
+                        np.array([7, 12], dtype=np.intp)]
 
         self._connectivity = connectivity
 
@@ -248,20 +249,20 @@ class TestPartitioner(TestCase):
                                   [3.0, 0.0], [0.0, 2.0], [1.0, 2.0], [2.0, 2.0], [3.0, 2.0],
                                   [2.0, 0.0], [2.0, 1.0], [1.0, 1.0], [0.0, 1.0], [2.0, 1.0], [2.0, 1.0], [3.0, 1.0],
                                   [2.0, 2.0]
-                                  ], dtype=np.float)
+                                  ], dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         nodes_df_desired = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
         
-        connectivity_desired = [np.array([5, 6, 3], dtype=np.int), np.array([3, 2, 5], dtype=np.int),
-                                np.array([1, 2, 3, 4], dtype=np.int), np.array([13, 7, 8], dtype=np.int),
-                                np.array([14, 7, 13], dtype=np.int),
-                                np.array([15, 16, 9, 10], dtype=np.int), np.array([18, 19, 20, 12], dtype=np.int),
-                                np.array([15, 17, 10, 11], dtype=np.int),
+        connectivity_desired = [np.array([5, 6, 3], dtype=np.intp), np.array([3, 2, 5], dtype=np.intp),
+                                np.array([1, 2, 3, 4], dtype=np.intp), np.array([13, 7, 8], dtype=np.intp),
+                                np.array([14, 7, 13], dtype=np.intp),
+                                np.array([15, 16, 9, 10], dtype=np.intp), np.array([18, 19, 20, 12], dtype=np.intp),
+                                np.array([15, 17, 10, 11], dtype=np.intp),
                                 # boundary elements
-                                np.array([4, 1], dtype=np.int), np.array([16, 9], dtype=np.int),
-                                np.array([7, 8], dtype=np.int), np.array([19, 12], dtype=np.int)]
+                                np.array([4, 1], dtype=np.intp), np.array([16, 9], dtype=np.intp),
+                                np.array([7, 8], dtype=np.intp), np.array([19, 12], dtype=np.intp)]
 
         data = {'connectivity': connectivity_desired}
         indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -291,14 +292,14 @@ class TestPartitioner(TestCase):
         submesh = self.partitioner._get_submesh_by_partition_id(1, separated_mesh)
         
         nodes_desired = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [2.0, 0.0], [2.0, 1.0]],
-                                 dtype=np.float)
+                                 dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [1, 2, 3, 4, 5, 6]
         nodes_df_desired = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
         
-        connectivity_desired = [np.array([5, 6, 3], dtype=np.int), np.array([3, 2, 5], dtype=np.int),
-                                np.array([1, 2, 3, 4], dtype=np.int), np.array([4, 1], dtype=np.int)]
+        connectivity_desired = [np.array([5, 6, 3], dtype=np.intp), np.array([3, 2, 5], dtype=np.intp),
+                                np.array([1, 2, 3, 4], dtype=np.intp), np.array([4, 1], dtype=np.intp)]
         data = {'connectivity': connectivity_desired}
         indices = [1, 2, 3, 9]
         el_df_desired = pd.DataFrame(data, index=indices)
@@ -315,13 +316,13 @@ class TestPartitioner(TestCase):
 
         submesh = self.partitioner._get_submesh_by_partition_id(4, separated_mesh)
         
-        nodes_desired = np.array([[3.0, 2.0], [2.0, 1.0], [3.0, 1.0], [2.0, 2.0]], dtype=np.float)
+        nodes_desired = np.array([[3.0, 2.0], [2.0, 1.0], [3.0, 1.0], [2.0, 2.0]], dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [12, 16, 19, 20]
         nodes_df_desired = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
         
-        connectivity_desired = [np.array([18, 19, 20, 12], dtype=np.int), np.array([19, 12], dtype=np.int)]
+        connectivity_desired = [np.array([18, 19, 20, 12], dtype=np.intp), np.array([19, 12], dtype=np.intp)]
         data = {'connectivity': connectivity_desired}
         indices = [7, 12]
         el_df_desired = pd.DataFrame(data, index=indices)

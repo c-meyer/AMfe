@@ -235,7 +235,7 @@ class IOTest(TestCase):
         for element in self.elements_input:
             assert_array_equal(
                 mesh.get_connectivity_by_elementids([element[0]])[0],
-                np.array(element[2], dtype=int))
+                np.array(element[2], dtype=np.intp))
 
         # CHECK DIMENSION
         self.assertEqual(mesh.dimension, 2)
@@ -1450,7 +1450,7 @@ class PostProcessorTest(TestCase):
             meshcomponent.mesh.nodes_df.index.values, ('uy'))
         q_x = q[dofs_x, :]
         q_y = q[dofs_y, :]
-        data = np.empty((0, 3, 4), dtype=float)
+        data = np.empty((0, 3, 4), dtype=np.float64)
         for node in meshcomponent.mesh.get_nodeidxs_by_all():
             data = np.concatenate((data, np.array(
                 [[q_x[node], q_y[node], np.zeros(q_x.shape[1])]])), axis=0)

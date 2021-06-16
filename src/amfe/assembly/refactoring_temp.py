@@ -433,7 +433,7 @@ class AssemblyConstraint(Assembly):
         for dofs in constraints_dofs_related:
             nonzero_in_B += len(dofs)
         # preallocate the CSR-matrix
-        row_global = np.zeros(nonzero_in_B, dtype=int)
+        row_global = np.zeros(nonzero_in_B, dtype=np.intp)
         col_global = row_global.copy()
 
         vals_global = np.zeros_like(col_global, dtype=bool)
@@ -449,7 +449,7 @@ class AssemblyConstraint(Assembly):
                 i += 1
 
         self.B_csr = sp.sparse.csr_matrix((vals_global, (row_global, col_global)),
-                                          shape=(ndof_const, no_of_dofs), dtype=float)
+                                          shape=(ndof_const, no_of_dofs), dtype=np.float64)
         t2 = time.clock()
         print('Done preallocating the Jacobian matrix of constraints with',
               ndof_const, 'constraints', 'and', no_of_dofs, 'dofs.')

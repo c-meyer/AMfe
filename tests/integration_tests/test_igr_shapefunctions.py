@@ -33,7 +33,7 @@ def jacobian(func, x):
     fx = func(x).copy()
     outdim = len(fx)
     indim = len(x)
-    jac = np.zeros((outdim, indim), dtype=float)
+    jac = np.zeros((outdim, indim), dtype=np.float64)
     for i in range(indim):
         x_temp = np.zeros(indim)
         x_temp[i] = 1.0

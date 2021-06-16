@@ -69,7 +69,7 @@ class ComponentConnector:
             constraint = slave_constraints.create_dirichlet_constraint()
             name = 'Compatibility' + str(loc_master_id) + str(loc_slave_id)
             for dof in slave_dofids:
-                slave_constraints.add_constraint(name, constraint, np.array([dof], dtype=int))
+                slave_constraints.add_constraint(name, constraint, np.array([dof], dtype=np.intp))
             X = slave_component.X
             u = np.zeros(X.shape)
 
@@ -79,7 +79,7 @@ class ComponentConnector:
             constraint = master_constraints.create_dirichlet_constraint()
             name = 'Compatibility' + str(loc_slave_id) + str(loc_master_id)
             for dof in master_dofids:
-                master_constraints.add_constraint(name, constraint, np.array([dof], dtype=int))
+                master_constraints.add_constraint(name, constraint, np.array([dof], dtype=np.intp))
             X = master_component.X
             u = np.zeros(X.shape)
 
@@ -179,8 +179,8 @@ class MeshTying:
             node-ids of component_b, that match nodeids_a of component_a
         """
         nodeids_a_full = mesh_a.nodes_df.index.values
-        nodeids_a = np.array([], dtype=int)
-        nodeids_b = np.array([], dtype=int)
+        nodeids_a = np.array([], dtype=np.intp)
+        nodeids_b = np.array([], dtype=np.intp)
 
         for node_a in nodeids_a_full:
             node_a_coord = mesh_a.nodes_df.loc[node_a]

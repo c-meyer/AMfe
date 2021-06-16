@@ -297,12 +297,12 @@ class ListElement:
         # Change the indices of Tet10-elements, as they are numbered differently
         # from the numbers used in AMFE and ParaView (last two indices permuted)
         if self.type == 'Tet10':
-            self.connectivity[np.array([9, 8], dtype=int)] = \
-                self.connectivity[np.array([8, 9], dtype=int)]
+            self.connectivity[np.array([9, 8], dtype=np.intp)] = \
+                self.connectivity[np.array([8, 9], dtype=np.intp)]
         # Same node numbering issue with Hexa20
         if self.type == 'Hexa20':
             hexa8_gmsh_swap = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 13, 9, 16, 18, 19,
-                                        17, 10, 12, 14, 15], dtype=int)
+                                        17, 10, 12, 14, 15], dtype=np.intp)
             self.connectivity[:] = self.connectivity[hexa8_gmsh_swap]
         self.connectivity = self.connectivity.tolist()
 

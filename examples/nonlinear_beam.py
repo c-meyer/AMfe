@@ -39,7 +39,7 @@ dirichlet = my_component.constraints.create_dirichlet_constraint()
 #nodeids = mesh.get_nodeids_by_groups([8])
 #dofs = my_component.mapping.get_dofs_by_nodeids(nodeids, ('ux', 'uy'))
 #for dof in dofs.reshape(-1):
-    #my_component.assign_constraint('Leftfixation', dirichlet, np.array([dof], dtype=int), np.array([], dtype=int))
+    #my_component.assign_constraint('Leftfixation', dirichlet, np.array([dof], dtype=np.intp), np.array([], dtype=np.intp))
 
 #neumann = my_component.neumann.create_fixed_direction_neumann((0, -1),
                                                                #lambda t: 1E8*np.sin(31*t))
@@ -66,10 +66,10 @@ nodeids = mesh.get_nodeids_by_groups([8])
 supportdofs_x = my_component.mapping.get_dofs_by_nodeids(nodeids, ('ux'))
 supportdofs_y = my_component.mapping.get_dofs_by_nodeids(nodeids, ('uy'))
 for dof in supportdofs_x.reshape(-1):
-    my_component.assign_constraint('Leftfixation', dirichlet, np.array([dof], dtype=int), np.array([], dtype=int))
+    my_component.assign_constraint('Leftfixation', dirichlet, np.array([dof], dtype=np.intp), np.array([], dtype=np.intp))
 
 for dof in supportdofs_y.reshape(-1):
-    my_component.assign_constraint('Leftmotion', dirichlet2, np.array([dof], dtype=int), np.array([], dtype=int))
+    my_component.assign_constraint('Leftmotion', dirichlet2, np.array([dof], dtype=np.intp), np.array([], dtype=np.intp))
 # END Variant B
 
 

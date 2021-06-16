@@ -90,8 +90,8 @@ def read_hbmat(filename):
     if n_rhs > 0:
         idx_0 += 1
 
-    indptr = sp.zeros(n_indptr, dtype=int)
-    indices = sp.zeros(n_indices, dtype=int)
+    indptr = sp.zeros(n_indptr, dtype=np.intp)
+    indices = sp.zeros(n_indices, dtype=np.intp)
     data = sp.zeros(n_data)
 
     indptr[:] = list(map(int, matrix_data[idx_0 : idx_0 + n_indptr]))

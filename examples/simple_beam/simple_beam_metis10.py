@@ -69,9 +69,9 @@ structural_composite.assign_neumann('Neumann0', my_neumann, ['neumann'], '_group
 # Dirichlet conditions
 dirichlet = structural_composite.components[1]._constraints.create_dirichlet_constraint()
 for dof in glo_dofs_x.reshape(-1):
-    structural_composite.assign_constraint('Dirichlet0', dirichlet, np.array([dof], dtype=int), [])
+    structural_composite.assign_constraint('Dirichlet0', dirichlet, np.array([dof], dtype=np.intp), [])
 for dof in glo_dofs_y.reshape(-1):
-    structural_composite.assign_constraint('Dirichlet1', dirichlet, np.array([dof], dtype=int), [])
+    structural_composite.assign_constraint('Dirichlet1', dirichlet, np.array([dof], dtype=np.intp), [])
 
 # FETI-solver
 substructured_system = MulticomponentMechanicalSystem(structural_composite, 'boolean')

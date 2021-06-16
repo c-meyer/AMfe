@@ -198,7 +198,7 @@ class PartitionedMeshComponentSeparator(PartitionedComponentSeparator):
         """
         mesh = deepcopy(mesh)
         nodes_mapping = pd.DataFrame(columns=('partition_id', 'global_nodeid', 'local_nodeid'))
-        nodes_mapping = nodes_mapping.astype(int)
+        nodes_mapping = nodes_mapping.astype(np.intp)
 
         for partition_id in mesh.get_uniques_by_tag('partition_id'):
             ele_ids = mesh.get_elementids_by_tags(['partition_id'], partition_id)

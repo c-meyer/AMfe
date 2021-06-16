@@ -31,8 +31,8 @@ class MeshComponent(ComponentBase):
         self._mesh = mesh
         self._mapping = StandardMapping()
         self._ele_obj_df = pd.DataFrame([], columns=['physics', 'fk_mesh', 'ele_obj', 'fk_mapping'])
-        self._ele_obj_df['fk_mapping'] = self._ele_obj_df['fk_mapping'].astype(int)
-        self._ele_obj_df['fk_mesh'] = self._ele_obj_df['fk_mesh'].astype(int)
+        self._ele_obj_df['fk_mapping'] = self._ele_obj_df['fk_mapping'].astype(np.intp)
+        self._ele_obj_df['fk_mesh'] = self._ele_obj_df['fk_mesh'].astype(np.intp)
         self._neumann = NeumannManager()
         self._assembly = Assembly()
         self._constraints = ConstraintManager()
@@ -132,11 +132,11 @@ class MeshComponent(ComponentBase):
         ele_shapes = self._mesh.get_ele_shapes_by_ids(eleids)
         new_df = pd.DataFrame({'physics': [physics]*len(ele_shapes), 'fk_mesh': eleids,
                                'ele_obj': [prototypes[ele_shape] for ele_shape in ele_shapes],
-                               'fk_mapping': np.ones(len(ele_shapes), dtype=int)*-1})
+                               'fk_mapping': np.ones(len(ele_shapes), dtype=np.intp)*-1})
         self._ele_obj_df = self._ele_obj_df.append(new_df, ignore_index=True)
         self._ele_obj_df = self._ele_obj_df.sort_index()
-        self._ele_obj_df['fk_mapping'] = self._ele_obj_df['fk_mapping'].astype(int)
-        self._ele_obj_df['fk_mesh'] = self._ele_obj_df['fk_mesh'].astype(int)
+        self._ele_obj_df['fk_mapping'] = self._ele_obj_df['fk_mapping'].astype(np.intp)
+        self._ele_obj_df['fk_mesh'] = self._ele_obj_df['fk_mesh'].astype(np.intp)
         self._update_mapping()
         self._C_csr = self._assembly.preallocate(self._mapping.no_of_dofs, self._mapping.elements2global)
         self._M_csr = self._C_csr.copy()
@@ -181,7 +181,7 @@ class MeshComponent(ComponentBase):
         print('Assigning Neumann Condition')
         if tag == '_groups':
             if ignore_nonexistent:
-                eleids = np.array([], dtype=int)
+                eleids = np.array([], dtype=np.intp)
                 valid_groups = []
 
                 for group in tag_values:
@@ -275,21 +275,21 @@ class MeshComponent(ComponentBase):
     
     @make_input_iterable
     def get_elementids_by_physics(self, physics):
-        elements = np.array([], dtype=int)
+        elements = np.array([], dtype=np.intp)
         for phys in physics: 
             elements = np.append(elements, self._ele_obj_df['fk_mesh'][self._ele_obj_df['physics'] == phys])
-        elements = elements.astype(int)
+        elements = elements.astype(np.intp)
         return elements
     
     @make_input_iterable
     def get_elementids_by_materials(self, material_obj):
-        ele_ids = np.array([], dtype=int)
+        ele_ids = np.array([], dtype=np.intp)
         for mat in material_obj:
             for eleid, element in self._ele_obj_df.iterrows():
                 if element['ele_obj'].material is mat:
                     ele_ids = np.append(ele_ids, element['fk_mesh'])
 
-        ele_ids = ele_ids.astype(int)
+        ele_ids = ele_ids.astype(np.intp)
         return ele_ids
 
     # -- GETTER FOR SYSTEM MATRICES ------------------------------------------------------------------------

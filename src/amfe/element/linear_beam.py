@@ -58,7 +58,7 @@ class LinearBeam3D(Element):
         l = np.linalg.norm(X_mat[1,:]-X_mat[0,:])
 
         # Element stiffness matrix
-        k_el_loc = np.zeros((12, 12), dtype=float)
+        k_el_loc = np.zeros((12, 12), dtype=np.float64)
 
         # Tension part
         scale_tension = self.material.E_modulus*self.material.crosssec/l
@@ -163,7 +163,7 @@ class LinearBeam3D(Element):
         e_y = e_y/np.linalg.norm(e_y)
         e_z = np.cross(e_x, e_y)
 
-        R = np.zeros((3, 3), dtype=float)
+        R = np.zeros((3, 3), dtype=np.float64)
 
         R[0, :] = e_x
         R[1, :] = e_y

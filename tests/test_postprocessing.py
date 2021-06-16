@@ -204,7 +204,7 @@ class AmfeSolutionReaderTest(TestCase):
         dofs_y = self.meshcomponent.mapping.get_dofs_by_nodeids(self.meshcomponent.mesh.nodes_df.index.values, ('uy'))
         q_x = q[dofs_x, :]
         q_y = q[dofs_y, :]
-        data = np.empty((0, 3, 4), dtype=float)
+        data = np.empty((0, 3, 4), dtype=np.float64)
         for node in self.meshcomponent.mesh.get_nodeidxs_by_all():
             data = np.concatenate((data, np.array([[q_x[node], q_y[node], np.zeros(q_x.shape[1])]])), axis=0)
         field_desired['data'] = data
@@ -213,8 +213,8 @@ class AmfeSolutionReaderTest(TestCase):
             normal_desired = copy(field)
             shear_desired = copy(field)
             values = field['data']
-            data1 = np.empty((0, 3, 4), dtype=float)
-            data2 = np.empty((0, 3, 4), dtype=float)
+            data1 = np.empty((0, 3, 4), dtype=np.float64)
+            data2 = np.empty((0, 3, 4), dtype=np.float64)
 
             for node in nodeidxs:
                 data1 = np.concatenate((data1, np.array([[values[0, node], values[1, node],
@@ -288,7 +288,7 @@ class AmfeSolutionReaderTest(TestCase):
         dofs_y = self.meshcomponent.mapping.get_dofs_by_nodeids(self.meshcomponent.mesh.nodes_df.index.values, ('uy'))
         q_x = data_test[dofs_x, :]
         q_y = data_test[dofs_y, :]
-        field_desired = np.empty((0, 3, 4), dtype=float)
+        field_desired = np.empty((0, 3, 4), dtype=np.float64)
         for node in self.meshcomponent.mesh.get_nodeidxs_by_all():
             field_desired = np.concatenate((field_desired,
                                             np.array([[q_x[node], q_y[node], np.zeros(q_x.shape[1])]])), axis=0)
@@ -300,7 +300,7 @@ class AmfeSolutionReaderTest(TestCase):
         data_test = sol['data']
         field_actual = self.postprocessorreader._convert_data_2_normal(data_test)
 
-        field_desired = np.empty((0, 3, 4), dtype=float)
+        field_desired = np.empty((0, 3, 4), dtype=np.float64)
         for node in self.meshcomponent.mesh.get_nodeidxs_by_all():
             field_desired = np.concatenate((field_desired, np.array([[data_test[0, node], data_test[1, node],
                                                       data_test[2, node]]])), axis=0)
@@ -312,7 +312,7 @@ class AmfeSolutionReaderTest(TestCase):
         data_test = sol['data']
         field_actual = self.postprocessorreader._convert_data_2_shear(data_test)
 
-        field_desired = np.empty((0, 3, 4), dtype=float)
+        field_desired = np.empty((0, 3, 4), dtype=np.float64)
         for node in self.meshcomponent.mesh.get_nodeidxs_by_all():
             field_desired = np.concatenate((field_desired, np.array([[data_test[3, node], data_test[4, node],
                                                       data_test[5, node]]])), axis=0)

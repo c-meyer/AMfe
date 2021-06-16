@@ -29,7 +29,7 @@ class PythonLine2ShapeFunction1D(ShapeFunction1DBase):
                  |
 
     """
-    _dndxi = np.array([[-0.5], [0.5]], dtype=float)
+    _dndxi = np.array([[-0.5], [0.5]], dtype=np.float64)
 
     def evaluate(self, xi, out):
         """

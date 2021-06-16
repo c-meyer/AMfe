@@ -256,8 +256,8 @@ class ConstraintManager:
         # Create new rows for constraints_df
         df = pd.DataFrame(
             {'name': name, 'constraint_obj': constraint_obj,
-             'dofidxs': [np.array([dofidxs], dtype=int).reshape(-1)],
-             'Xidxs': [np.array([Xidxs], dtype=int).reshape(-1)]},
+             'dofidxs': [np.array([dofidxs], dtype=np.intp).reshape(-1)],
+             'Xidxs': [np.array([Xidxs], dtype=np.intp).reshape(-1)]},
             )
 
         self._constraints_df = self._constraints_df.append(df, ignore_index=True)

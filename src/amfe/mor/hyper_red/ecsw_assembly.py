@@ -44,11 +44,11 @@ class EcswAssembly(StructuralAssembly):
         indices : numpy.array
             dtype = int, localization indices of the elements that have zero weights. Example: Assume, the elements
             [ele1, ele2, ele3, ele4, ele5] are passed, but only ele1, ele4 and ele5 have nonzero weights.
-            Then the indices array is np.array([0, 3, 4], dtype=int)
+            Then the indices array is np.array([0, 3, 4], dtype=np.intp)
         """
         super().__init__()
         self.weights = np.array(weights)
-        self.indices = np.array(indices, dtype=int)
+        self.indices = np.array(indices, dtype=np.intp)
 
     def assemble_k_and_f(self, nodes, ele_objects, connectivities, elements2dofs, dofvalues=None, t=0., K_csr=None,
                          f_glob=None):
@@ -95,7 +95,7 @@ class EcswAssembly(StructuralAssembly):
             K_csr = self.preallocate(no_of_dofs, elements2dofs)
 
         if f_glob is None:
-            f_glob = np.zeros(K_csr.shape[1], dtype=float)
+            f_glob = np.zeros(K_csr.shape[1], dtype=np.float64)
 
         K_csr.data[:] = 0.0
         f_glob[:] = 0.0
@@ -163,7 +163,7 @@ class EcswAssembly(StructuralAssembly):
             K_csr = self.preallocate(no_of_dofs, elements2dofs)
 
         if f_glob is None:
-            f_glob = np.zeros(K_csr.shape[1], dtype=float)
+            f_glob = np.zeros(K_csr.shape[1], dtype=np.float64)
 
         f_glob[:] = 0.0
         K_csr.data[:] = 0.0

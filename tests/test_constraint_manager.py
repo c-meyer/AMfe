@@ -67,14 +67,14 @@ class ConstraintManagerTest(TestCase):
     def test_add_constraint(self):
         self.cm.add_constraint('Dirich0', self.diric_constraint, [2], [2])
         constraint_df_desired = pd.DataFrame({'name': 'Dirich0', 'constraint_obj': self.diric_constraint,
-                                              'dofidxs': [np.array([2], dtype=int)],
-                                              'Xidxs': [np.array([2], dtype=int)]})
+                                              'dofidxs': [np.array([2], dtype=np.intp)],
+                                              'Xidxs': [np.array([2], dtype=np.intp)]})
         assert_frame_equal(self.cm._constraints_df, constraint_df_desired, check_like=True)
         self.cm.add_constraint('Dirich1', self.diric_constraint, [1], [1])
         constraint_df_desired = constraint_df_desired.append(pd.DataFrame({'name': 'Dirich1',
                                                                            'constraint_obj': self.diric_constraint,
-                                                                           'dofidxs': [np.array([1], dtype=int)],
-                                                                           'Xidxs': [np.array([1], dtype=int)]}),
+                                                                           'dofidxs': [np.array([1], dtype=np.intp)],
+                                                                           'Xidxs': [np.array([1], dtype=np.intp)]}),
                                                              ignore_index=True)
         print(self.cm._constraints_df)
         print(constraint_df_desired)
@@ -93,8 +93,8 @@ class ConstraintManagerTest(TestCase):
         self.cm.add_constraint('Dirich1', self.diric_constraint, [1], [1])
         self.cm.remove_constraint_by_name('Dirich0')
         constraint_df_desired = pd.DataFrame({'name': 'Dirich1', 'constraint_obj': self.diric_constraint,
-                                              'dofidxs': [np.array([1], dtype=int)],
-                                              'Xidxs': [np.array([1], dtype=int)]})
+                                              'dofidxs': [np.array([1], dtype=np.intp)],
+                                              'Xidxs': [np.array([1], dtype=np.intp)]})
         assert_frame_equal(self.cm._constraints_df, constraint_df_desired, check_like=True)
 
     def test_remove_constraint_by_dofidxs(self):
@@ -102,8 +102,8 @@ class ConstraintManagerTest(TestCase):
         self.cm.add_constraint('Dirich1', self.diric_constraint, [1], [1])
         self.cm.remove_constraint_by_dofidxs([2])
         constraint_df_desired = pd.DataFrame({'name': 'Dirich1', 'constraint_obj': self.diric_constraint,
-                                              'dofidxs': [np.array([1], dtype=int)],
-                                              'Xidxs': [np.array([1], dtype=int)]})
+                                              'dofidxs': [np.array([1], dtype=np.intp)],
+                                              'Xidxs': [np.array([1], dtype=np.intp)]})
         assert_frame_equal(self.cm._constraints_df, constraint_df_desired, check_like=True)
 
     def _initalization_for_g_b_test(self):
@@ -206,14 +206,14 @@ class PendulumConstraintManagerTest(TestCase):
             """
             # Add constraints to manager
             self.cm.add_constraint('Fixation1', self.constraint_fixation,
-                                   np.array([0], dtype=int),
-                                   np.array([], dtype=int))
+                                   np.array([0], dtype=np.intp),
+                                   np.array([], dtype=np.intp))
             self.cm.add_constraint('Fixation1', self.constraint_fixation,
-                                   np.array([1], dtype=int),
-                                   np.array([], dtype=int))
+                                   np.array([1], dtype=np.intp),
+                                   np.array([], dtype=np.intp))
             self.cm.add_constraint('Pendulum', self.constraint_pendulum,
-                                   np.array([0, 1, 2, 3], dtype=int),
-                                   np.array([0, 1, 2, 3], dtype=int))
+                                   np.array([0, 1, 2, 3], dtype=np.intp),
+                                   np.array([0, 1, 2, 3], dtype=np.intp))
             # set time to zero
             t = 0.0
 
