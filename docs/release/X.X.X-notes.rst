@@ -50,9 +50,6 @@ amfe.mor improvements
 amfe.neumann improvements
 -------------------------
 
-amfe.parametric improvements
-----------------------------
-
 amfe.solver improvements
 ------------------------
 
