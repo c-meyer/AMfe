@@ -6,6 +6,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse import hstack as sphstack
 from scipy.sparse import vstack as spvstack
 from numpy.testing import assert_array_equal, assert_allclose
+from .tools import jacobian_finite_difference
 
 from amfe.constraint.constraint_formulation_lagrange_multiplier import SparseLagrangeMultiplierConstraintFormulation
 
@@ -95,6 +96,21 @@ class SparseLagrangeFormulationTest(TestCase):
         assert_array_equal(du, dx[:self.no_of_dofs_unconstrained])
         assert_array_equal(ddu, ddx[:self.no_of_dofs_unconstrained])
         assert_array_equal(lagrange_multiplier, x[self.no_of_dofs_unconstrained:])
+
+    def test_jacobian(self):
+        x0 = np.arange(self.formulation.dimension, dtype=float)
+        dx0 = x0.copy() + 1.0
+        ddx0 = dx0.copy() + 1.0
+
+        def u(x):
+            ur, dur, ddur = self.formulation.recover(x, dx0, ddx0, 5.0)
+            return ur
+
+        jac_actual = self.formulation.jac_du_dx(x0, 0.0).todense()
+        jac_desired = jacobian_finite_difference(u, self.formulation.no_of_dofs_unconstrained, x0)
+
+        assert_allclose(jac_actual, jac_desired)
+
 
     def test_M(self):
         x = np.arange(self.formulation.dimension, dtype=np.float64)

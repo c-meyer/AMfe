@@ -16,6 +16,7 @@ amfe.assembly improvements
 amfe.constraint improvements
 ----------------------------
 - Added Fixed Distance to Plane constraint.
+- Added jacobian du_dx to Constraint formulation.
 
 amfe.element improvements
 -------------------------

@@ -9,6 +9,7 @@ import numpy as np
 from scipy.linalg import null_space
 from scipy.sparse import csr_matrix, identity
 from scipy.sparse import vstack as spvstack
+from scipy.sparse import eye as speye
 
 from .constraint_formulation import ConstraintFormulationBase
 
@@ -159,6 +160,26 @@ class NullspaceConstraintFormulation(ConstraintFormulationBase):
 
         """
         return x
+
+    def jac_du_dx(self, x, t):
+        """
+        Returns the jacobian of the displacements w.r.t. the state vector.
+
+        Parameters
+        ----------
+        x: numpy.array
+            Global state vector of the system
+        t: float
+            time
+
+        Returns
+        -------
+        jac_du_dx: csr_matrix
+            Jacobian of the displacements w.r.t. the state vector.
+
+        """
+        return speye(self._no_of_dofs_unconstrained,
+                     self._no_of_dofs_unconstrained, format='csr')
 
     def du(self, x, dx, t):
         """
