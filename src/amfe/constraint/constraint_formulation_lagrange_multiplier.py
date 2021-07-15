@@ -9,6 +9,7 @@ import numpy as np
 from scipy.sparse import csr_matrix, issparse
 from scipy.sparse import hstack as sphstack
 from scipy.sparse import vstack as spvstack
+from scipy.sparse import eye as speye
 
 from .constraint_formulation import ConstraintFormulationBase
 
@@ -223,6 +224,26 @@ class SparseLagrangeMultiplierConstraintFormulation(ConstraintFormulationBase):
 
         """
         return x[:self._no_of_dofs_unconstrained]
+
+    def jac_du_dx(self, x, t):
+        """
+        Returns the jacobian of the displacements w.r.t. the state vector.
+
+        Parameters
+        ----------
+        x: numpy.array
+            Global state vector of the system
+        t: float
+            time
+
+        Returns
+        -------
+        jac_du_dx: csr_matrix
+            Jacobian of the displacements w.r.t. the state vector.
+
+        """
+        return speye(self._no_of_dofs_unconstrained, self.dimension,
+                     format='csr')
 
     def du(self, x, dx, t):
         """

@@ -35,7 +35,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         super().__init__(no_of_dofs_unconstrained, M_func, h_func, B_func, p_func,
                          jac_h_u, jac_h_du, jac_p_u, jac_p_du,
                          g_func, b_func, a_func)
-        self._L = None
+        self._L_cached = None
         self._L_changed = True  # Setting flag for lazy evaluation
 
     @property
@@ -48,10 +48,10 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         dim: int
             dimension of the system after constraints are applied
         """
-        return self.L.shape[1]
+        return self._L.shape[1]
 
     @property
-    def L(self):
+    def _L(self):
         """
         Returns the L matrix that is able to eliminate the constrained dofs by applying :math:`L^T A L` to a matrices A
 
@@ -63,7 +63,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         if self._L_changed:
             self._compute_L()
             self._L_changed = False
-        return self._L
+        return self._L_cached
 
     def update(self):
         """
@@ -94,9 +94,9 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         B = self._B_func(q, t)
         constrained_dofs = self._get_constrained_dofs_by_B(B)
         if issparse(B):
-            self._L = self._get_L_by_constrained_dofs(constrained_dofs, B.shape[1], format='csr')
+            self._L_cached = self._get_L_by_constrained_dofs(constrained_dofs, B.shape[1], format='csr')
         else:
-            self._L = self._get_L_by_constrained_dofs(constrained_dofs, B.shape[1], format='dense')
+            self._L_cached = self._get_L_by_constrained_dofs(constrained_dofs, B.shape[1], format='dense')
 
     @staticmethod
     def _get_constrained_dofs_by_B(B):
@@ -182,7 +182,26 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
             recovered displacements of the unconstrained system
 
         """
-        return self.L.dot(x)
+        return self._L.dot(x)
+
+    def jac_du_dx(self, x, t):
+        """
+        Returns the jacobian of the displacements w.r.t. the state vector.
+
+        Parameters
+        ----------
+        x: numpy.array
+            Global state vector of the system
+        t: float
+            time
+
+        Returns
+        -------
+        jac_du_dx: csr_matrix
+            Jacobian of the displacements w.r.t. the state vector.
+
+        """
+        return self._L
 
     def du(self, x, dx, t):
         """
@@ -202,7 +221,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
             recovered velocities of the unconstrained system
 
         """
-        return self.L.dot(dx)
+        return self._L.dot(dx)
 
     def ddu(self, x, dx, ddx, t):
         """
@@ -224,7 +243,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
             recovered accelerations of the unconstrained system
 
         """
-        return self.L.dot(ddx)
+        return self._L.dot(ddx)
 
     def lagrange_multiplier(self, x, t):
         """
@@ -273,7 +292,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         """
         u = self.u(x, t)
         du = self.du(x, dx, t)
-        return self.L.T.dot(self._M_func(u, du, t)).dot(self.L)
+        return self._L.T.dot(self._M_func(u, du, t)).dot(self._L)
 
     def f_int(self, x, dx, t):
         r"""
@@ -304,7 +323,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
 
         u = self.u(x, t)
         du = self.du(x, dx, t)
-        return self.L.T.dot(self._h_func(u, du, t))
+        return self._L.T.dot(self._h_func(u, du, t))
 
     def f_ext(self, x, dx, t):
         r"""
@@ -335,7 +354,7 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
 
         u = self.u(x, t)
         du = self.du(x, dx, t)
-        return self.L.T.dot(self._p_func(u, du, t))
+        return self._L.T.dot(self._p_func(u, du, t))
 
     def K(self, x, dx, t):
         r"""
@@ -367,9 +386,9 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         du = self.du(x, dx, t)
         if self._jac_h_u is not None:
             if self._jac_p_u is not None:
-                return self.L.T.dot(self._jac_h_u(u, du, t) - self._jac_p_u(u, du, t)).dot(self.L)
+                return self._L.T.dot(self._jac_h_u(u, du, t) - self._jac_p_u(u, du, t)).dot(self._L)
             else:
-                return self.L.T.dot(self._jac_h_u(u, du, t)).dot(self.L)
+                return self._L.T.dot(self._jac_h_u(u, du, t)).dot(self._L)
         else:
             raise NotImplementedError('Numerical differentiation of h is not implemented yet')
 
@@ -403,8 +422,8 @@ class BooleanEliminationConstraintFormulation(ConstraintFormulationBase):
         du = self.du(x, dx, t)
         if self._jac_h_du is not None:
             if self._jac_p_du is not None:
-                return self.L.T.dot(self._jac_h_du(u, du, t) - self._jac_p_du(u, du, t)).dot(self.L)
+                return self._L.T.dot(self._jac_h_du(u, du, t) - self._jac_p_du(u, du, t)).dot(self._L)
             else:
-                return self.L.T.dot(self._jac_h_du(u, du, t)).dot(self.L)
+                return self._L.T.dot(self._jac_h_du(u, du, t)).dot(self._L)
         else:
             raise NotImplementedError('Numerical differentiation of h is not implemented yet')

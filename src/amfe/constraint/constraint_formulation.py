@@ -195,6 +195,25 @@ class ConstraintFormulationBase:
         """
         raise NotImplementedError('u recovery is not implemented')
 
+    def jac_du_dx(self, x, t):
+        """
+        Returns the jacobian of the displacements w.r.t. the state vector.
+
+        Parameters
+        ----------
+        x: numpy.array
+            Global state vector of the system
+        t: float
+            time
+
+        Returns
+        -------
+        jac_du_dx: numpy.array
+            Jacobian of the displacements w.r.t. the state vector.
+
+        """
+        raise NotImplementedError('jacobian is not implemented')
+
     def du(self, x, dx, t):
         """
         Recovers the velocities of the unconstrained system

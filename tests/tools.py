@@ -5,6 +5,23 @@ from numpy.testing import assert_array_equal, assert_array_almost_equal
 __all__ = ['CustomDictAssertTest']
 
 
+def jacobian_finite_difference(func, outdim, x0):
+    '''
+    Compute the jacobian of func with respect to u using a finite differences scheme.
+
+    '''
+    indim = len(x0)
+    jac = np.zeros((outdim, indim))
+    h = np.sqrt(np.finfo(float).eps)
+    f = func(x0).copy()
+    for i in range(indim):
+        x_tmp = x0.copy()
+        x_tmp[i] += h
+        f_tmp = func(x_tmp)
+        jac[:, i] = (f_tmp - f) / h
+    return jac
+
+
 class CustomDictAssertTest(TestCase):
     """
     Customized methods to test dictionaries by iterating through their items.

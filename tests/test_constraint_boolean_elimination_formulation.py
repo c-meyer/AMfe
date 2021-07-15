@@ -3,8 +3,9 @@
 from unittest import TestCase
 import numpy as np
 from scipy.sparse import csr_matrix
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_allclose
 from amfe.constraint.constraint_formulation_boolean_elimination import BooleanEliminationConstraintFormulation
+from .tools import jacobian_finite_difference
 
 
 class BooleanEliminationFormulationTest(TestCase):
@@ -120,6 +121,20 @@ class BooleanEliminationFormulationTest(TestCase):
         assert_array_equal(du, np.concatenate((zero_array, dx)))
         assert_array_equal(ddu, np.concatenate((zero_array, ddx)))
 
+    def test_jacobian(self):
+        x0 = np.arange(self.formulation.dimension, dtype=float)
+        dx0 = x0.copy() + 1.0
+        ddx0 = dx0.copy() + 1.0
+
+        def u(x):
+            ur, dur, ddur = self.formulation.recover(x, dx0, ddx0, 5.0)
+            return ur
+
+        jac_actual = self.formulation.jac_du_dx(x0, 0.0).todense()
+        jac_desired = jacobian_finite_difference(u, self.formulation.no_of_dofs_unconstrained, x0)
+
+        assert_allclose(jac_actual, jac_desired)
+
     def test_M(self):
         x = np.arange(self.formulation.dimension, dtype=float)
         dx = x.copy()
@@ -183,14 +198,16 @@ class BooleanEliminationFormulationTest(TestCase):
         K_actual_dense = self.formulation_dense.K(x, dx, 0.0)
         assert_array_equal(K_actual_dense, K_desired.todense())
 
-    def test_L(self):
-        L_desired = np.array([[0, 0], [1, 0], [0, 1]], dtype=float)
-        L_actual = self.formulation.L
-        self.assertIsInstance(L_actual, csr_matrix)
-        assert_array_equal(L_actual.todense(), L_desired)
+    def test_jacobian_2(self):
+        x = np.array([2.0, 4.0])  # Just two random values
+        t = 0.5  # Random value
+        jac_desired = np.array([[0, 0], [1, 0], [0, 1]], dtype=float)
+        jac_actual = self.formulation.jac_du_dx(x, t)
+        self.assertIsInstance(jac_actual, csr_matrix)
+        assert_array_equal(jac_actual.todense(), jac_desired)
 
-        L_actual_dense = self.formulation_dense.L
-        assert_array_equal(L_actual_dense, L_desired)
+        jac_actual_dense = self.formulation_dense.jac_du_dx(x, t)
+        assert_array_equal(jac_actual_dense, jac_desired)
 
     def test_L_without_constraints(self):
         def B(u, t):
@@ -204,6 +221,6 @@ class BooleanEliminationFormulationTest(TestCase):
                                                               self.h_q_func, self.h_dq_func,
                                                               g_func=g)
 
-        L_desired = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=float)
-        L_actual = formulation.L
-        assert_array_equal(L_actual.todense(), L_desired)
+        jac_desired = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=float)
+        jac_actual = formulation.jac_du_dx(np.array([3.0, 2.0, -4.0]), 3.1)  # Random values for x and t
+        assert_array_equal(jac_actual.todense(), jac_desired)
