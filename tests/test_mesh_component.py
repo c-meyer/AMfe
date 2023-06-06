@@ -65,15 +65,15 @@ class TestMeshComponent(TestCase):
 
     def test_no_of_elements(self):
         component = StructuralComponent(self.testmesh)
-        eleids1 = np.array([1, 2], dtype=int)
+        eleids1 = np.array([1, 2], dtype=np.intp)
         component.assign_material(self.mat1, eleids1, 'S', '_eleids')
         no_of_elements_actual = component.no_of_elements
         self.assertEqual(no_of_elements_actual, 2)
 
     def test_assign_material_by_eleids(self):
         component = StructuralComponent(self.testmesh)
-        eleids1 = np.array([1, 2], dtype=int)
-        eleids2 = np.array([3], dtype=int)
+        eleids1 = np.array([1, 2], dtype=np.intp)
+        eleids2 = np.array([3], dtype=np.intp)
         component.assign_material(self.mat1, eleids1, 'S', '_eleids')
         ele_obj_actual = component.ele_obj
         # check ele_obj is instance array
@@ -91,7 +91,7 @@ class TestMeshComponent(TestCase):
         # check mapping
         nodal2global_desired = pd.DataFrame({'ux': {1: -1, 2: 6, 3: 4, 4: -1, 5: 0, 6: 2},
                                              'uy': {1: -1, 2: 7, 3: 5, 4: -1, 5: 1, 6: 3}})
-        elements2global_desired = [np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([4, 5, 6, 7, 0, 1], dtype=int)]
+        elements2global_desired = [np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([4, 5, 6, 7, 0, 1], dtype=np.intp)]
         assert_frame_equal(component.mapping.nodal2global, nodal2global_desired)
         for actual, desired in zip(component.mapping.elements2global, elements2global_desired):
             assert_array_equal(actual, desired)
@@ -112,15 +112,15 @@ class TestMeshComponent(TestCase):
         self.assertEqual(ele_obj_df.loc[mask3, 'ele_obj'].values[0].material.name, 'rubber')
         nodal2global_desired = pd.DataFrame({'ux': {1: 8, 2: 6, 3: 4, 4: 10, 5: 0, 6: 2},
                                              'uy': {1: 9, 2: 7, 3: 5, 4: 11, 5: 1, 6: 3}})
-        elements2global_desired = [np.array([0, 1, 2, 3, 4, 5], dtype=int),
-                                   np.array([4, 5, 6, 7, 0, 1], dtype=int),
-                                   np.array([8,  9,  6,  7,  4,  5, 10, 11], dtype=int)]
+        elements2global_desired = [np.array([0, 1, 2, 3, 4, 5], dtype=np.intp),
+                                   np.array([4, 5, 6, 7, 0, 1], dtype=np.intp),
+                                   np.array([8,  9,  6,  7,  4,  5, 10, 11], dtype=np.intp)]
         assert_frame_equal(component.mapping.nodal2global, nodal2global_desired)
         for actual, desired in zip(component.mapping.elements2global, elements2global_desired):
             assert_array_equal(actual, desired)
 
         component = StructuralComponent(self.testmesh)
-        eleids3 = np.array([3, 1], dtype=int)
+        eleids3 = np.array([3, 1], dtype=np.intp)
         component.assign_material(self.mat1, eleids3, 'S', '_eleids')
         ele_obj_actual = component.ele_obj
         # check ele_obj is instance array
@@ -140,8 +140,8 @@ class TestMeshComponent(TestCase):
         self.assertEqual(ele_obj_df.loc[mask3, 'ele_obj'].values[0].material.name, 'steel')
         nodal2global_desired = pd.DataFrame({'ux': {1: 0, 2: 2, 3: 4, 4: 6, 5: 8, 6: 10},
                                              'uy': {1: 1, 2: 3, 3: 5, 4: 7, 5: 9, 6: 11}})
-        elements2global_desired = [np.array([0,  1,  2,  3,  4,  5, 6, 7], dtype=int),
-                                   np.array([8, 9, 10, 11, 4, 5], dtype=int)]
+        elements2global_desired = [np.array([0,  1,  2,  3,  4,  5, 6, 7], dtype=np.intp),
+                                   np.array([8, 9, 10, 11, 4, 5], dtype=np.intp)]
         assert_frame_equal(component.mapping.nodal2global, nodal2global_desired)
         for actual, desired in zip(component.mapping.elements2global, elements2global_desired):
             assert_array_equal(actual, desired)
@@ -213,7 +213,7 @@ class TestMeshComponent(TestCase):
         neumann_df_actual = component._neumann._neumann_df
         df_dict = {'name': {0: 'TestCondition'},
                    'neumann_obj': {0: condition},
-                   'property_names': {0: np.array([4, 5], dtype=int)},
+                   'property_names': {0: np.array([4, 5], dtype=np.intp)},
                    'tag': {0: '_eleids'}}
         neumann_df_desired = pd.DataFrame.from_dict(df_dict)
         assert_frame_equal(neumann_df_actual, neumann_df_desired, check_like=True)
@@ -324,13 +324,13 @@ class TestMeshComponent(TestCase):
 
     def test_get_elementids_by_physics(self):
         component = StructuralComponent(self.testmesh)
-        eleids1 = np.array([1, 2], dtype=int)
-        eleids2 = np.array([3], dtype=int)
+        eleids1 = np.array([1, 2], dtype=np.intp)
+        eleids2 = np.array([3], dtype=np.intp)
         component.assign_material(self.mat1, eleids1, 'S', '_eleids')
         component.assign_material(self.mat2, eleids2, 'S', '_eleids')
 
         eleids_actual = component.get_elementids_by_physics('S')
-        eleids_desired = np.array([1, 2, 3], dtype=int)
+        eleids_desired = np.array([1, 2, 3], dtype=np.intp)
 
         assert_array_equal(eleids_actual, eleids_desired)
 

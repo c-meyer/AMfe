@@ -147,7 +147,7 @@ class TestNeumannManager(TestCase):
         self.assertEqual(neumann_obj_array[3, 1], 9)
 
         pandas_indices_actual = self.neumann_man.el_df.index.to_numpy()
-        pandas_indices_desired = np.array([0, 1, 2, 3], dtype=int)
+        pandas_indices_desired = np.array([0, 1, 2, 3], dtype=np.intp)
         assert_array_equal(pandas_indices_actual, pandas_indices_desired)
 
         self.assertEqual(neumann_obj_array.shape, (4, 2))
@@ -155,7 +155,7 @@ class TestNeumannManager(TestCase):
         neumann_df_actual = self.neumann_man._neumann_df
         df_dict = {'name': {0: 'TestCondition1', 1: 'TestCondition2'},
                    'tag': {0: '_eleids', 1: '_eleids'},
-                   'property_names': {0: np.array([2, 7], dtype=int), 1: np.array([3, 9], dtype=int)},
+                   'property_names': {0: np.array([2, 7], dtype=np.intp), 1: np.array([3, 9], dtype=np.intp)},
                    'neumann_obj': {0: neumannbc1, 1: neumannbc2}
                    }
         neumann_df_desired = pd.DataFrame.from_dict(df_dict)

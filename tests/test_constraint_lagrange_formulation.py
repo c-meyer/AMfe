@@ -6,21 +6,22 @@ from scipy.sparse import csr_matrix
 from scipy.sparse import hstack as sphstack
 from scipy.sparse import vstack as spvstack
 from numpy.testing import assert_array_equal, assert_allclose
+from .tools import jacobian_finite_difference
 
 from amfe.constraint.constraint_formulation_lagrange_multiplier import SparseLagrangeMultiplierConstraintFormulation
 
 
 class SparseLagrangeFormulationTest(TestCase):
     def setUp(self):
-        M_mat = np.array([[1, -1, 0], [-1, 1.2, -1.5], [0, -1.5, 2]], dtype=float)
-        K_mat = np.array([[2, -1, 0], [-1, 2, -1.5], [0, -1.5, 3]], dtype=float)
+        M_mat = np.array([[1, -1, 0], [-1, 1.2, -1.5], [0, -1.5, 2]], dtype=np.float64)
+        K_mat = np.array([[2, -1, 0], [-1, 2, -1.5], [0, -1.5, 3]], dtype=np.float64)
         D_mat = 0.2 * M_mat + 0.1 * K_mat
 
         self.M_unconstr = csr_matrix(M_mat)
         self.D_unconstr = csr_matrix(D_mat)
         self.K_unconstr = csr_matrix(K_mat)
-        self.f_int_unconstr = np.array([1, 2, 3], dtype=float)
-        self.f_ext_unconstr = np.array([3, 4, 5], dtype=float)
+        self.f_int_unconstr = np.array([1, 2, 3], dtype=np.float64)
+        self.f_ext_unconstr = np.array([3, 4, 5], dtype=np.float64)
 
         def M(u, du, t):
             return self.M_unconstr
@@ -38,10 +39,10 @@ class SparseLagrangeFormulationTest(TestCase):
             return self.D_unconstr
 
         def g_holo(u, t):
-            return np.array(u[0], dtype=float, ndmin=1)
+            return np.array(u[0], dtype=np.float64, ndmin=1)
 
         def B_holo(u, t):
-            return csr_matrix(np.array([[1, 0, 0]], dtype=float, ndmin=2))
+            return csr_matrix(np.array([[1, 0, 0]], dtype=np.float64, ndmin=2))
 
         self.no_of_constraints = 1
         self.no_of_dofs_unconstrained = 3
@@ -78,7 +79,7 @@ class SparseLagrangeFormulationTest(TestCase):
         self.formulation.update()
 
     def test_recover_u_du_ddu_lambda(self):
-        x = np.arange(self.formulation.dimension, dtype=float)
+        x = np.arange(self.formulation.dimension, dtype=np.float64)
         dx = x.copy() + 1.0
         ddx = dx.copy() + 1.0
 
@@ -96,8 +97,23 @@ class SparseLagrangeFormulationTest(TestCase):
         assert_array_equal(ddu, ddx[:self.no_of_dofs_unconstrained])
         assert_array_equal(lagrange_multiplier, x[self.no_of_dofs_unconstrained:])
 
+    def test_jacobian(self):
+        x0 = np.arange(self.formulation.dimension, dtype=float)
+        dx0 = x0.copy() + 1.0
+        ddx0 = dx0.copy() + 1.0
+
+        def u(x):
+            ur, dur, ddur = self.formulation.recover(x, dx0, ddx0, 5.0)
+            return ur
+
+        jac_actual = self.formulation.jac_du_dx(x0, 0.0).todense()
+        jac_desired = jacobian_finite_difference(u, self.formulation.no_of_dofs_unconstrained, x0)
+
+        assert_allclose(jac_actual, jac_desired)
+
+
     def test_M(self):
-        x = np.arange(self.formulation.dimension, dtype=float)
+        x = np.arange(self.formulation.dimension, dtype=np.float64)
         dx = x.copy()
 
         M_desired = spvstack((sphstack((self.M_unconstr,
@@ -113,7 +129,7 @@ class SparseLagrangeFormulationTest(TestCase):
 
     def test_f_int(self):
         x = np.arange(self.no_of_dofs_unconstrained + self.no_of_constraints,
-                      dtype=float) + 1.0
+                      dtype=np.float64) + 1.0
         dx = x.copy() + 1.0
         u = x[:self.no_of_dofs_unconstrained]
         du = dx[:self.no_of_dofs_unconstrained]
@@ -125,7 +141,7 @@ class SparseLagrangeFormulationTest(TestCase):
 
     def test_f_ext(self):
         x = np.arange(self.no_of_dofs_unconstrained + self.no_of_constraints,
-                      dtype=float) + 1.0
+                      dtype=np.float64) + 1.0
         dx = x.copy() + 1.0
         u = x[:self.no_of_dofs_unconstrained]
         du = dx[:self.no_of_dofs_unconstrained]
@@ -137,7 +153,7 @@ class SparseLagrangeFormulationTest(TestCase):
         assert_array_equal(F_actual, F_desired)
 
     def test_D(self):
-        x = np.arange(self.formulation.dimension, dtype=float)
+        x = np.arange(self.formulation.dimension, dtype=np.float64)
         dx = x.copy()
 
         D_desired = spvstack((sphstack((self.D_unconstr,
@@ -152,7 +168,7 @@ class SparseLagrangeFormulationTest(TestCase):
         assert_array_equal(D_actual.todense(), D_desired.todense())
 
     def test_K(self):
-        x = np.arange(self.formulation.dimension, dtype=float)
+        x = np.arange(self.formulation.dimension, dtype=np.float64)
         dx = x.copy()
 
         K_desired = spvstack((sphstack((self.K_unconstr,
@@ -176,7 +192,7 @@ class SparseLagrangeFormulationTest(TestCase):
                                                                     self.h_func, B, self.p_func,
                                                                     self.h_q_func, self.h_dq_func,
                                                                     g_func=g_holo)
-        x = np.arange(formulation.dimension, dtype=float)
+        x = np.arange(formulation.dimension, dtype=np.float64)
         dx = x.copy()
         self.assertEqual(formulation._no_of_constraints, 0.0)
 

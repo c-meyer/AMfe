@@ -59,22 +59,22 @@ class GeneralizedAlphaTest(TestCase):
 
     def test_set_prediction(self):
         t_0 = 0.0
-        q_0 = np.array([0, 0, 0, 0], dtype=float)
-        dq_0 = np.array([0, 0, 0, 0], dtype=float)
-        ddq_0 = np.array([0, 0, 0, 1], dtype=float)
+        q_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        dq_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        ddq_0 = np.array([0, 0, 0, 1], dtype=np.float64)
 
         self.integrator.set_prediction(q_0, dq_0, ddq_0, t_0)
 
         self.assertEqual(self.integrator.t_p, 0.1)
         assert_allclose(self.integrator.q_p, np.array([0, 0, 0, 0]))
         assert_allclose(self.integrator.dq_p, np.array([0, 0, 0, 0.00025]))
-        assert_allclose(self.integrator.ddq_p, np.array([0, 0, 0, -0.805], dtype=float))
+        assert_allclose(self.integrator.ddq_p, np.array([0, 0, 0, -0.805], dtype=np.float64))
 
     def test_residual(self):
         t_0 = 0.0
-        q_0 = np.array([0, 0, 0, 0], dtype=float)
-        dq_0 = np.array([0, 0, 0, 0], dtype=float)
-        ddq_0 = np.array([0, 0, 0, 1], dtype=float)
+        q_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        dq_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        ddq_0 = np.array([0, 0, 0, 1], dtype=np.float64)
 
         self.integrator.set_prediction(q_0, dq_0, ddq_0, t_0)
 
@@ -86,9 +86,9 @@ class GeneralizedAlphaTest(TestCase):
 
     def test_jacobian(self):
         t_0 = 0.0
-        q_0 = np.array([0, 0, 0, 0], dtype=float)
-        dq_0 = np.array([0, 0, 0, 0], dtype=float)
-        ddq_0 = np.array([0, 0, 0, 1], dtype=float)
+        q_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        dq_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        ddq_0 = np.array([0, 0, 0, 1], dtype=np.float64)
 
         self.integrator.set_prediction(q_0, dq_0, ddq_0, t_0)
 
@@ -101,9 +101,9 @@ class GeneralizedAlphaTest(TestCase):
 
     def test_set_correction(self):
         t_0 = 0.0
-        q_0 = np.array([0, 0, 0, 0], dtype=float)
-        dq_0 = np.array([0, 0, 0, 0], dtype=float)
-        ddq_0 = np.array([0, 0, 0, 1], dtype=float)
+        q_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        dq_0 = np.array([0, 0, 0, 0], dtype=np.float64)
+        ddq_0 = np.array([0, 0, 0, 1], dtype=np.float64)
 
         self.integrator.set_prediction(q_0, dq_0, ddq_0, t_0)
 

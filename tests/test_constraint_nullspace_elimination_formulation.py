@@ -3,21 +3,23 @@
 from unittest import TestCase
 import numpy as np
 from scipy.sparse import csr_matrix
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_allclose
 
 from amfe.constraint.constraint_formulation_nullspace_elimination import NullspaceConstraintFormulation
+
+from .tools import jacobian_finite_difference
 
 
 class TestNullspaceConstraintFormulation(TestCase):
     def setUp(self):
-        M_mat = np.array([[1, -1, 0], [-1, 1.2, -1.5], [0, -1.5, 2]], dtype=float)
-        K_mat = np.array([[2, -1, 0], [-1, 2, -1.5], [0, -1.5, 3]], dtype=float)
+        M_mat = np.array([[1, -1, 0], [-1, 1.2, -1.5], [0, -1.5, 2]], dtype=np.float64)
+        K_mat = np.array([[2, -1, 0], [-1, 2, -1.5], [0, -1.5, 3]], dtype=np.float64)
         D_mat = 0.2 * M_mat + 0.1 * K_mat
 
         self.M_unconstr = csr_matrix(M_mat)
         self.D_unconstr = csr_matrix(D_mat)
         self.K_unconstr = csr_matrix(K_mat)
-        self.f_int_unconstr = np.array([1, 2, 3], dtype=float)
+        self.f_int_unconstr = np.array([1, 2, 3], dtype=np.float64)
         self.f_ext_unconstr = np.array([3, 4, 5], dtype=float)
 
         def M(u, du, t):
@@ -95,6 +97,20 @@ class TestNullspaceConstraintFormulation(TestCase):
         assert_array_equal(u, x[:self.no_of_dofs_unconstrained])
         assert_array_equal(du, dx[:self.no_of_dofs_unconstrained])
         assert_array_equal(ddu, ddx[:self.no_of_dofs_unconstrained])
+
+    def test_jacobian(self):
+        x0 = np.arange(self.formulation.dimension, dtype=float)
+        dx0 = x0.copy() + 1.0
+        ddx0 = dx0.copy() + 1.0
+
+        def u(x):
+            ur, dur, ddur = self.formulation.recover(x, dx0, ddx0, 5.0)
+            return ur
+
+        jac_actual = self.formulation.jac_du_dx(x0, 0.0).todense()
+        jac_desired = jacobian_finite_difference(u, self.formulation.no_of_dofs_unconstrained, x0)
+
+        assert_allclose(jac_actual, jac_desired)
 
     def test_M(self):
         x = np.arange(self.formulation.dimension, dtype=float)

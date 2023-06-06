@@ -1,0 +1,93 @@
+========================
+AMfe 1.2.0 Release Notes
+========================
+
+
+Highlights of this release
+--------------------------
+
+
+New features
+============
+
+amfe.assembly improvements
+--------------------------
+
+amfe.constraint improvements
+----------------------------
+- Added Fixed Distance to Plane constraint.
+- Added jacobian du_dx to Constraint formulation.
+
+amfe.element improvements
+-------------------------
+- Added Shape-Function Base module.
+- Added Numpy-Implementation of Shapefunctions
+- Added Factory for Numpy-Implementation of Shapefunctions
+
+amfe.fortran improvements
+-------------------------
+
+amfe.io improvements
+--------------------
+- Added a reader for gmsh ascii files of version 4
+
+amfe.linalg improvements
+------------------------
+
+amfe.mapping improvements
+-------------------------
+
+amfe.mor improvements
+---------------------
+- The reduction basis updating algorithms are moved to this module.
+
+amfe.neumann improvements
+-------------------------
+
+amfe.parametric improvements
+----------------------------
+- This module has been removed. You can find mesh morphing techniques in the new package ammorph.
+- The Reduction basis updating algorithms are moved to mor submodule.
+
+amfe.solver improvements
+------------------------
+- translators.py Removed unnecessary layer in creation of constrained systems from components to avoid double memoizing and to have a cleaner structure
+- Fixed issue with importing MKL shared object
+
+amfe.forces improvements
+------------------------
+
+amfe.material improvements
+--------------------------
+
+amfe.mesh improvements
+----------------------
+
+amfe.structural_dynamics improvements
+-------------------------------------
+
+amfe.tools improvements
+-----------------------
+
+amfe.ui improvements
+--------------------
+
+
+Deprecated features
+===================
+
+Backwards incompatible changes
+==============================
+
+Bug Fixes
+=========
+- Fixed Bug in Mesh object where dtype of nodes_df can fail in some circumstances.
+
+Other changes
+=============
+- Removed Pickle files in tests since they are not safe for different python versions.
+
+- Fixed import issue in tests for test_io
+- Fixed issue with sphinx and jinja2 incompatibility.
+- Changed all integer dtypes for indexing to dtype=np.intp
+- Changed all float dtypes to np.float64

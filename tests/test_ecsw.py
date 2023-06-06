@@ -6,6 +6,7 @@
 
 
 from unittest import TestCase
+from os.path import join, dirname, abspath
 
 import numpy as np
 from numpy.testing import assert_, assert_allclose, assert_array_equal
@@ -13,7 +14,6 @@ from numpy.linalg import norm
 
 from amfe.mor.hyper_red.ecsw import sparse_nnls, ecsw_assemble_G_and_b, ecsw_get_weights_by_component
 from amfe.mor.ui import create_ecsw_hyperreduced_component_from_weights
-from amfe.io.tools import amfe_dir
 from amfe.io.mesh.reader import GidJsonMeshReader
 from amfe.io.mesh.writer import AmfeMeshConverter
 from amfe.mor.hyper_red.ecsw_assembly import EcswAssembly
@@ -80,7 +80,8 @@ class TestNnls(TestCase):
 class TestEcsw(TestCase):
     def setUp(self):
         # Define input file path
-        file = amfe_dir('tests/meshes/gid_json_4_tets.json')
+        here = dirname(abspath(__file__))
+        file = join(here, 'meshes', 'gid_json_4_tets.json')
         # Define Reader Object, initialized with AmfeMeshConverter
         reader = GidJsonMeshReader(file)
 
@@ -215,9 +216,9 @@ class TestEcsw(TestCase):
 
 class EcswTest(TestCase):
     def setUp(self):
-        self.nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]], dtype=np.float)
-        self.iconnectivity = [np.array([0, 1, 2], dtype=np.int), np.array([0, 2, 3], dtype=np.int),
-                              np.array([1, 2], dtype=np.int), np.array([2, 3], dtype=np.int)]
+        self.nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]], dtype=np.float64)
+        self.iconnectivity = [np.array([0, 1, 2], dtype=np.intp), np.array([0, 2, 3], dtype=np.intp),
+                              np.array([1, 2], dtype=np.intp), np.array([2, 3], dtype=np.intp)]
 
         self.asm = StructuralAssembly()
 
@@ -258,10 +259,10 @@ class EcswTest(TestCase):
     def test_assemble_k_and_f_ecsw_test1(self):
 
         weights = [5]
-        indices = np.array([1], dtype=int)
+        indices = np.array([1], dtype=np.intp)
         asm = EcswAssembly(weights, indices)
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)])
+        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)])
 
         K_global = asm.preallocate(8, element2dofs[indices])
         f_global = np.zeros(K_global.shape[0])
@@ -306,10 +307,10 @@ class EcswTest(TestCase):
     def test_assemble_k_and_f_ecsw_test2(self):
 
         weights = np.array([5.0, 4.0])
-        indices = np.array([1, 0], dtype=int)
+        indices = np.array([1, 0], dtype=np.intp)
         asm = EcswAssembly(weights, indices)
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)])
+        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)])
 
         K_global, f_global = asm.assemble_k_and_f(self.nodes, ele_obj, self.iconnectivity[0:2], element2dofs, K_csr=None,
                                                  f_glob=None)
@@ -338,11 +339,11 @@ class EcswTest(TestCase):
     def test_assemble_k_f_S_E_ecsw(self):
 
         weights = [5]
-        indices = np.array([1], dtype=int)
+        indices = np.array([1], dtype=np.intp)
         asm = EcswAssembly(weights, indices)
 
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        element2dofs = [np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)]
+        element2dofs = [np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)]
         elements_on_node = np.array([weights[0], np.Inf, weights[0], weights[0]])
 
         K_global = asm.preallocate(8, element2dofs)

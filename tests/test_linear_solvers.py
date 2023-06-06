@@ -28,7 +28,7 @@ class TestPardisoSolver(TestCase):
 
 class TestScipySparseSolver(TestCase):
     def test_solve(self):
-        A = numpy.array([[4, -2, 0, 0], [-2, 4 , -2, 0], [0, -2, 4, -1], [0, 0, -1, 1]], dtype = float)
+        A = numpy.array([[4, -2, 0, 0], [-2, 4 , -2, 0], [0, -2, 4, -1], [0, 0, -1, 1]], dtype=numpy.float64)
         A = scipy.sparse.csr_matrix(A)
         b = numpy.array([1.4, 1.2, 0.8, 1.1])
         solver = ScipySparseLinearSolver()
@@ -39,7 +39,7 @@ class TestScipySparseSolver(TestCase):
         
 class TestScipyConjugateGradientLinearSolver(TestCase):
     def test_solve(self):
-        A = numpy.array([[4, -2, 0, 0], [-2, 4 , -2, 0], [0, -2, 4, -1], [0, 0, -1, 1]], dtype=float)
+        A = numpy.array([[4, -2, 0, 0], [-2, 4 , -2, 0], [0, -2, 4, -1], [0, 0, -1, 1]], dtype=numpy.float64)
         A = scipy.sparse.csr_matrix(A)
         b = numpy.array([1.4, 1.2, 0.8, 1.1])
         solver = ScipyConjugateGradientLinearSolver()
@@ -60,7 +60,7 @@ class TestScipyConjugateGradientLinearSolver(TestCase):
         
 class TestResidualbasedConjugateGradient(TestCase):
     def test_solve(self):
-        A = numpy.array([[4, -2, 0, 0], [-2, 4 , -2, 0], [0, -2, 4, -1], [0, 0, -1, 1]], dtype=float)
+        A = numpy.array([[4, -2, 0, 0], [-2, 4 , -2, 0], [0, -2, 4, -1], [0, 0, -1, 1]], dtype=numpy.float64)
         A = scipy.sparse.csr_matrix(A)
         b = numpy.array([1.4, 1.2, 0.8, 1.1])
         solver = ResidualbasedConjugateGradient()

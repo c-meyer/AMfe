@@ -30,32 +30,32 @@ class DummyMesh:
 
         nodes_desired = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [2.0, 0.0], [2.0, 1.0], [3.0, 1.0], [3.0, 0.0], [0.0, 2.0], [1.0, 2.0], [2.0, 2.0], [3.0, 2.0],
                           [1.0, 1.0], [2.0, 0.0], [2.0, 1.0], [2.0, 1.0], [2.0, 1.0], [0.0, 1.0], [3.0, 1.0], [2.0, 2.0]
-                          ], dtype=np.float)
+                          ], dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         self.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
 
-        connectivity_desired = [np.array([5, 6, 3], dtype=np.int), np.array([3, 2, 5], dtype=np.int),
-                        np.array([1, 2, 3, 4], dtype=np.int), np.array([14, 7, 8], dtype=np.int), np.array([15, 7, 14], dtype=np.int),
-                        np.array([13, 18, 9, 10], dtype=np.int), np.array([17, 19, 20, 12], dtype=np.int), np.array([13, 16, 10, 11], dtype=np.int),
+        connectivity_desired = [np.array([5, 6, 3], dtype=np.intp), np.array([3, 2, 5], dtype=np.intp),
+                        np.array([1, 2, 3, 4], dtype=np.intp), np.array([14, 7, 8], dtype=np.intp), np.array([15, 7, 14], dtype=np.intp),
+                        np.array([13, 18, 9, 10], dtype=np.intp), np.array([17, 19, 20, 12], dtype=np.intp), np.array([13, 16, 10, 11], dtype=np.intp),
                         # boundary elements
-                        np.array([4, 1], dtype=np.int), np.array([18, 9], dtype=np.int), np.array([7, 8], dtype=np.int), np.array([19, 12], dtype=np.int)]
+                        np.array([4, 1], dtype=np.intp), np.array([18, 9], dtype=np.intp), np.array([7, 8], dtype=np.intp), np.array([19, 12], dtype=np.intp)]
 
 
         data = {'connectivity': connectivity_desired}
         indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         """
-        nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [2.0, 0.0], [2.0, 1.0]], dtype=np.float)
+        nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [2.0, 0.0], [2.0, 1.0]], dtype=np.float64)
         x = nodes[:, 0]
         y = nodes[:, 1]
         nodeids = [1, 2, 3, 4, 5, 6]
         self.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
 
-        connectivity = [np.array([5, 6, 3], dtype=np.int), np.array([3, 2, 5], dtype=np.int),
-                        np.array([1, 2, 3, 4], dtype=np.int),
+        connectivity = [np.array([5, 6, 3], dtype=np.intp), np.array([3, 2, 5], dtype=np.intp),
+                        np.array([1, 2, 3, 4], dtype=np.intp),
                         # boundary elements
-                        np.array([4, 1], dtype=np.int)]
+                        np.array([4, 1], dtype=np.intp)]
 
         data = {'shape': ['Tri3', 'Tri3', 'Quad4', 'straight_line'],
                 'is_boundary': [False, False, False, True],
@@ -97,15 +97,15 @@ class DummyMesh2(DummyMesh):
         1---2---5---8               |       |    |   |
                                     1---2---5    5---8
         """
-        nodes_desired = np.array([[3.0, 1.0], [3.0, 0.0], [2.0, 0.0], [2.0, 1.0]], dtype=np.float)
+        nodes_desired = np.array([[3.0, 1.0], [3.0, 0.0], [2.0, 0.0], [2.0, 1.0]], dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [7, 8, 14, 15]
         self.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
 
-        connectivity = [np.array([14, 7, 8], dtype=np.int), np.array([15, 7, 14], dtype=np.int),
+        connectivity = [np.array([14, 7, 8], dtype=np.intp), np.array([15, 7, 14], dtype=np.intp),
                         # boundary elements
-                        np.array([7, 8], dtype=np.int)]
+                        np.array([7, 8], dtype=np.intp)]
 
         data = {'shape': ['Tri3', 'Tri3', 'straight_line'],
                 'is_boundary': [False, False, True],
@@ -135,15 +135,15 @@ class DummyMesh3(DummyMesh):
         """
         nodes_desired = np.array(
             [[0.0, 2.0], [1.0, 2.0], [2.0, 2.0],
-             [1.0, 1.0], [2.0, 1.0], [0.0, 1.0]], dtype=np.float)
+             [1.0, 1.0], [2.0, 1.0], [0.0, 1.0]], dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [9, 10, 11, 13, 16, 18]
         self.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
 
-        connectivity_desired = [np.array([13, 18, 9, 10], dtype=np.int), np.array([13, 16, 10, 11], dtype=np.int),
+        connectivity_desired = [np.array([13, 18, 9, 10], dtype=np.intp), np.array([13, 16, 10, 11], dtype=np.intp),
                                 # boundary elements
-                                np.array([18, 9], dtype=np.int)]
+                                np.array([18, 9], dtype=np.intp)]
 
         data = {'connectivity': connectivity_desired}
         indices = [1, 2, 3]
@@ -166,15 +166,15 @@ class DummyMesh5(DummyMesh):
         1---2---5---8               |       |    |   |
                                     1---2---5    5---8
         """
-        nodes_desired = np.array([[4.0, 1.0], [4.0, 0.0], [3.0, 0.0], [3.0, 1.0]], dtype=np.float)
+        nodes_desired = np.array([[4.0, 1.0], [4.0, 0.0], [3.0, 0.0], [3.0, 1.0]], dtype=np.float64)
         x = nodes_desired[:, 0]
         y = nodes_desired[:, 1]
         nodeids = [7, 8, 14, 15]
         self.nodes_df = pd.DataFrame({'x': x, 'y': y}, index=nodeids)
 
-        connectivity = [np.array([14, 7, 8], dtype=np.int), np.array([15, 7, 14], dtype=np.int),
+        connectivity = [np.array([14, 7, 8], dtype=np.intp), np.array([15, 7, 14], dtype=np.intp),
                         # boundary elements
-                        np.array([7, 8], dtype=np.int)]
+                        np.array([7, 8], dtype=np.intp)]
 
         data = {'shape': ['Tri3', 'Tri3', 'straight_line'],
                 'is_boundary': [False, False, True],

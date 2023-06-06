@@ -91,9 +91,9 @@ class AssemblyToolsTest(TestCase):
 
 class StructuralAssemblyTest(TestCase):
     def setUp(self):
-        self.nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]], dtype=np.float)
-        self.iconnectivity = [np.array([0, 1, 2], dtype=np.int), np.array([0, 2, 3], dtype=np.int),
-                              np.array([1, 2], dtype=np.int), np.array([2, 3], dtype=np.int)]
+        self.nodes = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]], dtype=np.float64)
+        self.iconnectivity = [np.array([0, 1, 2], dtype=np.intp), np.array([0, 2, 3], dtype=np.intp),
+                              np.array([1, 2], dtype=np.intp), np.array([2, 3], dtype=np.intp)]
 
         self.asm = StructuralAssembly()
 
@@ -133,7 +133,7 @@ class StructuralAssemblyTest(TestCase):
 
     def test_preallocate_csr(self):
         no_of_dofs = 6
-        elements2global = np.array([np.array([0, 1, 2, 3], dtype=int), np.array([2, 3, 4, 5], dtype=int)])
+        elements2global = np.array([np.array([0, 1, 2, 3], dtype=np.intp), np.array([2, 3, 4, 5], dtype=np.intp)])
         C_csr_actual = self.asm.preallocate(no_of_dofs, elements2global)
 
         vals = np.zeros(32)
@@ -151,7 +151,7 @@ class StructuralAssemblyTest(TestCase):
         asm = StructuralAssembly()
 
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        elements2global = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)])
+        elements2global = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)])
 
         M_global = asm.preallocate(8, elements2global)
 
@@ -178,7 +178,7 @@ class StructuralAssemblyTest(TestCase):
     def test_assemble_k_and_f(self):
         asm = StructuralAssembly()
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)])
+        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)])
         K_global = asm.preallocate(8, element2dofs)
         f_global = np.zeros(K_global.shape[0])
 
@@ -207,7 +207,7 @@ class StructuralAssemblyTest(TestCase):
 
         asm = StructuralAssembly()
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)])
+        element2dofs = np.array([np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)])
         K_global = asm.preallocate(8, element2dofs)
         f_global = np.zeros(K_global.shape[0])
         memory_K_global_before = id(K_global)
@@ -241,7 +241,7 @@ class StructuralAssemblyTest(TestCase):
     def test_assemble_k_f_S_E(self):
         asm = StructuralAssembly()
         ele_obj = np.array([self.ele, self.ele], dtype=object)
-        element2dofs = [np.array([0, 1, 2, 3, 4, 5], dtype=int), np.array([0, 1, 4, 5, 6, 7], dtype=int)]
+        element2dofs = [np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)]
         elements_on_node = np.array([2, 1, 2, 1], dtype=float)
         C_csr = asm.preallocate(8, element2dofs)
         f_global = np.zeros(C_csr.shape[0])
