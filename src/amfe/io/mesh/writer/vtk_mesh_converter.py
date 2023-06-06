@@ -249,18 +249,23 @@ class VtkMeshConverter(MeshConverter):
             y = self._nodes[:, 2]
             z = self._nodes[:, 3]
             no_of_nodes = self._nodes.shape[0]
-            self._nodes_df = pd.DataFrame({'row': np.arange(no_of_nodes, dtype=np.intp), 'x': x, 'y': y, 'z': z},
-                                          index=np.array(self._nodes[:, 0], dtype=np.intp))
+            self._nodes_df = pd.DataFrame({'row': np.arange(no_of_nodes, dtype=int), 'x': x, 'y': y, 'z': z},
+                                          index=np.array(self._nodes[:, 0], dtype=int))
 
             self._vtknodes.SetNumberOfPoints(no_of_nodes)
 
         if not self._el_df.isnull().values.any():
             # Function change connectivity ids to row ids in nodes array:
             def change_connectivity(arr):
-                return np.array([self._nodes_df.loc[node, 'row'] for node in arr], ndmin=2, dtype=np.intp)
+                return np.array([self._nodes_df.loc[node, 'row'] for node in arr], ndmin=2, dtype=int)
 
             def write_vtk_element(idx, etype, nodes):
                 cell = self.amfe2vtk[etype]()
+                # Check if reordering needed:
+                if etype == 'Tet10':
+                    reordering = np.array([0, 1, 2, 3, 4, 5, 6, 9, 7, 8],
+                                          dtype=int)
+                    nodes = nodes[reordering]
                 for i, node in enumerate(nodes):
                     cell.GetPointIds().SetId(i, node)
                     self._eleid2cell.update({idx: cell})

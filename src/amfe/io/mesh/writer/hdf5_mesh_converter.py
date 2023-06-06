@@ -31,7 +31,7 @@ class Hdf5MeshConverter(MeshConverter):
     def __init__(self, filename):
         super().__init__()
         self._filename = filename
-        self._nodes = np.empty((0, 3), dtype=np.float64)
+        self._nodes = np.empty((0, 3), dtype=float)
         self._nodes_current_row = 0
         self._node_preallocation = self.Preallocation.UNKNOWN
         self._nodeids2row = dict()
@@ -57,14 +57,14 @@ class Hdf5MeshConverter(MeshConverter):
             self._nodes[self._nodes_current_row, :] = [float(idx), float(x), float(y), float(z)]
         else:
             if self._node_preallocation == self.Preallocation.UNKNOWN:
-                self._nodes = np.empty((0, 4), dtype=np.float64)
+                self._nodes = np.empty((0, 4), dtype=float)
                 self._node_preallocation = self.Preallocation.NOTPREALLOCATED
-            self._nodes = np.append(self._nodes, np.array([idx, x, y, z], ndmin=2, dtype=np.float64), axis=0)
+            self._nodes = np.append(self._nodes, np.array([idx, x, y, z], ndmin=2, dtype=float), axis=0)
         self._nodeids2row.update({id: self._nodes_current_row})
         self._nodes_current_row += 1
 
     def build_element(self, eid, etype, nodes):
-        self._connectivity.append(np.array(nodes, dtype=np.intp))
+        self._connectivity.append(np.array(nodes, dtype=int))
         self._ele_indices.append(eid)
         self._eleshapes.append(etype)
 
@@ -120,7 +120,7 @@ class Hdf5MeshConverter(MeshConverter):
         z = self._nodes[:, 3]
         self._no_of_nodes = self._nodes.shape[0]
 
-        self._nodes_df = pd.DataFrame({'row': np.arange(self._no_of_nodes), 'x': x, 'y': y, 'z': z}, index=np.array(self._nodes[:, 0], dtype=np.intp))
+        self._nodes_df = pd.DataFrame({'row': np.arange(self._no_of_nodes), 'x': x, 'y': y, 'z': z}, index=np.array(self._nodes[:, 0], dtype=int))
 
         # make a pd Dataframe for the elements
         data = {'shape': self._eleshapes,
@@ -135,7 +135,7 @@ class Hdf5MeshConverter(MeshConverter):
 
         # Function change connectivity ids to row ids in nodes array:
         def change_connectivity(arr):
-            return np.array([self._nodes_df.loc[node, 'row'] for node in arr], ndmin=2, dtype=np.intp)
+            return np.array([self._nodes_df.loc[node, 'row'] for node in arr], ndmin=2, dtype=int)
         self._el_df['connectivity'] = self._el_df['connectivity'].apply(change_connectivity)
 
         self._tag_names = list()
@@ -193,8 +193,12 @@ class Hdf5MeshConverter(MeshConverter):
             no_of_elements_of_current_etype = len(connectivity_of_current_etype)
             no_of_nodes_per_element = connectivity_of_current_etype[0].shape[1]
             connectivity_array = np.concatenate(connectivity_of_current_etype, axis=0)
+            if etype == 'Tet10':
+                reordering = np.array([0, 1, 2, 3, 4, 5, 6, 9, 7, 8],
+                                      dtype=int)
+                connectivity_array = connectivity_array[:, reordering]
             if no_of_elements_of_current_etype > 0:
-                hdf_fp.create_array(group_elements, etype, connectivity_array.astype(np.intp),
+                hdf_fp.create_array(group_elements, etype, connectivity_array.astype(int),
                                     shape=(no_of_elements_of_current_etype, no_of_nodes_per_element))
 
             for tag in self._tag_names:

@@ -147,11 +147,11 @@ class MeshComponent(ComponentBase):
         logger = logging.getLogger(__name__)
         logger.debug('Update number of elements on nodes...')
         self._elements_on_nodes = np.zeros(self._mesh.no_of_nodes)
-        for nodeidx in range(self._mesh.no_of_nodes):
-            nodeids = self._mesh.get_nodeids_by_nodeidxs([nodeidx])
-            element_ids_all = self._mesh.get_elementids_by_nodeids(nodeids)
-            element_ids = np.intersect1d(self._ele_obj_df['fk_mesh'].values, element_ids_all)
-            self._elements_on_nodes[nodeidx] = element_ids.size
+        # get volume elements:
+        element_ids = self._ele_obj_df['fk_mesh'].values
+        iconn = np.array([self._mesh.get_iconnectivity_by_elementids(element_ids)]).reshape(-1)
+        for ic in iconn:
+            self._elements_on_nodes[ic] += 1
         logger.debug('Update number of elements on nodes finished.')
 
     # -- ASSIGN NEUMANN CONDITION METHODS -----------------------------------------------------------------
