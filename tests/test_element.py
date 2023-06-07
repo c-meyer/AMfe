@@ -55,8 +55,8 @@ class ElementTest(unittest.TestCase):
     '''Base class for testing the elements with the jacobian'''
     def initialize_element(self, element, X_def):
         no_of_dofs = len(X_def)
-        self.X = X_def + 0.5*sp.rand(no_of_dofs)
-        self.u = sp.rand(no_of_dofs)
+        self.X = X_def + 0.5*np.random.rand(no_of_dofs)
+        self.u = np.random.rand(no_of_dofs)
         self.my_material = KirchhoffMaterial(E=60, nu=1/4, rho=1, thickness=1)
         self.my_element = element(self.my_material)
 
@@ -84,7 +84,7 @@ class LinearBeam3DTest(ElementTest):
     def setUp(self):
         no_of_dofs = 12
         self.X = X_linear_beam
-        self.u = sp.rand(no_of_dofs)
+        self.u = np.random.rand(no_of_dofs)
         self.my_material = BeamMaterial(120, 80, 1000.0, 4.0, 23.0, 34.0, 132.0, (0.0, 0.0, 1E23))
         self.my_element = LinearBeam3D(self.my_material)
 
@@ -207,14 +207,14 @@ class MaterialTest3D(ElementTest):
         self.u *= 0.1
 
     def test_Mooney(self):
-        A10, A01, kappa, rho = sp.rand(4)*1E3 + 100
+        A10, A01, kappa, rho = np.random.rand(4)*1E3 + 100
         print('Material parameters A10, A01 and kappa:', A10, A01, kappa)
         my_material = MooneyRivlin(A10, A01, kappa, rho)
         self.my_element.material = my_material
         self.jacobi_check_element(rtol=1E-3)
 
     def test_Neo(self):
-        mu, kappa, rho = sp.rand(3)*1E3 + 100
+        mu, kappa, rho = np.random.rand(3)*1E3 + 100
         print('Material parameters mu, kappa:', mu, kappa)
 #        mu /= 4
         my_material = NeoHookean(mu, kappa, rho)
@@ -231,13 +231,13 @@ class MaterialTest2D(ElementTest):
         self.u *= 0.1
 
     def test_Mooney(self):
-        A10, A01, kappa, rho = sp.rand(4)*1E3 + 100
+        A10, A01, kappa, rho = np.random.rand(4)*1E3 + 100
         my_material = MooneyRivlin(A10, A01, kappa, rho)
         self.my_element.material = my_material
         self.jacobi_check_element(rtol=5E-4)
 
     def test_Neo(self):
-        mu, kappa, rho = sp.rand(3)*1E3 + 100
+        mu, kappa, rho = np.random.rand(3)*1E3 + 100
 #        mu /= 4
         kappa *= 100
         my_material = NeoHookean(mu, kappa, rho)
@@ -248,11 +248,11 @@ class MaterialTest2D(ElementTest):
 
 class MaterialTest(unittest.TestCase):
     def setUp(self):
-        mu, kappa, rho = sp.rand(3)
+        mu, kappa, rho = np.random.rand(3)
         A10 = mu/2
         A01 = 0
-        F = sp.rand(3,3)
-        self.E = 1/2*(F.T @ F - sp.eye(3))
+        F = np.random.rand(3,3)
+        self.E = 1/2*(F.T @ F - np.eye(3))
         self.mooney = MooneyRivlin(A10, A01, kappa, rho)
         self.neo = NeoHookean(mu, kappa, rho)
 
@@ -274,11 +274,11 @@ class MaterialTest(unittest.TestCase):
 
 class MaterialTest2dPlaneStress(unittest.TestCase):
     def setUp(self):
-        F = sp.zeros((3,3))
-        F[:2,:2] = sp.rand(2,2)
+        F = np.zeros((3,3))
+        F[:2,:2] = np.random.rand(2,2)
         F[2,2] = 1
-        self.E = 1/2*(F.T @ F - sp.eye(3))
-        A10, A01, kappa, rho = sp.rand(4)
+        self.E = 1/2*(F.T @ F - np.eye(3))
+        A10, A01, kappa, rho = np.random.rand(4)
         mu = A10*2
         self.mooney = MooneyRivlin(A10, A01, kappa, rho, plane_stress=False)
         self.neo = NeoHookean(mu, kappa, rho, plane_stress=False)
@@ -394,9 +394,9 @@ class TestB_matrix_compuation(unittest.TestCase):
 
         # Routine for testing the compute_B_matrix_routine
         # Try it the hard way:
-        B_tilde = sp.rand(4, ndim)
-        F = sp.rand(ndim, ndim)
-        S_v = sp.rand(ndim*(ndim+1)//2)
+        B_tilde = np.random.rand(4, ndim)
+        F = np.random.rand(ndim, ndim)
+        S_v = np.random.rand(ndim*(ndim+1)//2)
 
         if ndim == 2:
             S = np.array([[S_v[0], S_v[2]], [S_v[2], S_v[1]]])

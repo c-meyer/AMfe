@@ -209,9 +209,10 @@ class ComponentConnectorTest(TestCase):
             def __init__(self, nodeids):
                 dofids_helper = np.arange(2*len(nodeids), dtype=int)
                 self.dofids = pd.DataFrame(columns=['nodeid', 'dofs'])
+                self.dofids.set_index('nodeid')
                 for i, node in enumerate(nodeids):
-                    new_dof = pd.Series({'nodeid': node, 'dofs': dofids_helper[[2*i, 2*i+1]]})
-                    self.dofids = self.dofids.append(new_dof, ignore_index=True)
+                    new_dof = pd.DataFrame({'nodeid': node, 'dofs': [dofids_helper[[2*i, 2*i+1]]]})
+                    self.dofids = pd.concat([self.dofids, new_dof], ignore_index=True)
                     self.dofids = self.dofids.astype(dtype={'nodeid': 'int', 'dofs': 'object'})
                 self.dofids = self.dofids.set_index('nodeid')
 

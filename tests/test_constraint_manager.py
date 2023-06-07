@@ -71,10 +71,10 @@ class ConstraintManagerTest(TestCase):
                                               'Xidxs': [np.array([2], dtype=np.intp)]})
         assert_frame_equal(self.cm._constraints_df, constraint_df_desired, check_like=True)
         self.cm.add_constraint('Dirich1', self.diric_constraint, [1], [1])
-        constraint_df_desired = constraint_df_desired.append(pd.DataFrame({'name': 'Dirich1',
+        constraint_df_desired = pd.concat([constraint_df_desired, pd.DataFrame({'name': 'Dirich1',
                                                                            'constraint_obj': self.diric_constraint,
                                                                            'dofidxs': [np.array([1], dtype=np.intp)],
-                                                                           'Xidxs': [np.array([1], dtype=np.intp)]}),
+                                                                           'Xidxs': [np.array([1], dtype=np.intp)]})],
                                                              ignore_index=True)
         print(self.cm._constraints_df)
         print(constraint_df_desired)

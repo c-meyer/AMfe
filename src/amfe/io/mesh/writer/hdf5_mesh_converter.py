@@ -184,7 +184,7 @@ class Hdf5MeshConverter(MeshConverter):
         # write topology for each element
         for etype in self._el_df['shape'].unique():
             el_df_by_shape = self._el_df[self._el_df['shape'] == etype]
-            for counter, (index, item) in enumerate(el_df_by_shape['shape'].iteritems()):
+            for counter, (index, item) in enumerate(el_df_by_shape['shape'].items()):
                 row['index'] = index
                 row['etype'] = item
                 row['etype_index'] = counter

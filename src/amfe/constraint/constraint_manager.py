@@ -260,7 +260,7 @@ class ConstraintManager:
              'Xidxs': [np.array([Xidxs], dtype=np.intp).reshape(-1)]},
             )
 
-        self._constraints_df = self._constraints_df.append(df, ignore_index=True)
+        self._constraints_df = pd.concat([self._constraints_df, df], ignore_index=True)
         constraint_obj.after_assignment(dofidxs)
 
         self._update_flag = True

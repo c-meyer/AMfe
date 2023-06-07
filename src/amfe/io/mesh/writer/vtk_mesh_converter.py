@@ -133,8 +133,8 @@ class VtkMeshConverter(MeshConverter):
             self._nodes[self._index, 3] = z
             self._index += 1
         else:
-            new_node = pd.Series({'row': self._nodes_df['row'].count(), 'x': x, 'y': y, 'z': z}, name=int(node_id))
-            self._nodes_df = self._nodes_df.append(new_node)
+            new_node = pd.DataFrame({'row': self._nodes_df['row'].count(), 'x': x, 'y': y, 'z': z}, index=[int(node_id)])
+            self._nodes_df = pd.concat([self._nodes_df, new_node])
             self._nodes_df = self._nodes_df.astype(dtype={'row': 'int', 'x': 'float', 'y': 'float', 'z': 'float'})
             self._nodespreallocation = VtkPreallocation.NOTPREALLOCATED
 

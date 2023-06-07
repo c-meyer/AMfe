@@ -2,7 +2,7 @@
 include README.md
 include LICENSE
 include CONTRIBUTING.md
-include meta.cfg
+include setup.cfg
 include pyproject.toml
 include THANKS.txt
 include pylintrc
