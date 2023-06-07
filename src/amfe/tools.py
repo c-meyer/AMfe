@@ -134,7 +134,7 @@ def append_interactively(filename):
     print('The filename is:', filename)
     raw = input('You can now add a string to the output file name:\n')
 
-    if raw is not '':
+    if raw != '':
         string = '_' + raw.replace(' ', '_')
     else:
         string = ''

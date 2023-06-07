@@ -318,9 +318,9 @@ class SolverFactory:
 
     # ------------------------------------------ CREATE INTEGRATOR OBJECTS -------------------------------------------
     def _create_integration_stepper(self, integrator, opt):
-        if opt is 'linear':
+        if opt == 'linear':
             return LinearIntegrationStepper(integrator)
-        elif opt is 'nonlinear':
+        elif opt == 'nonlinear':
             return NonlinearIntegrationStepper(integrator)
         else:
             raise ValueError('Unsupported type of integration-stepper')

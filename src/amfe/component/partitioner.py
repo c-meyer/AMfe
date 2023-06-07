@@ -239,7 +239,7 @@ class PartitionedMeshComponentSeparator(PartitionedComponentSeparator):
         for group in group_names:
             if group_subname in group:
                 ele_ids = mesh.get_elementids_by_groups((group,))
-                if len(ele_ids) is not 0:
+                if len(ele_ids) != 0:
                     subgroups[group] = ele_ids
 
         return subgroups
@@ -262,13 +262,13 @@ class PartitionedMeshComponentSeparator(PartitionedComponentSeparator):
         for group_id, group_eles in element_set_1.items():
             for part_id, part_eles in element_set_2.items():
                 new_eles = np.intersect1d(group_eles, part_eles)
-                if new_eles.size is not 0:
+                if new_eles.size != 0:
                     partition_map[partition_id] = new_eles
                     eles_that_have_partition_id = np.append(eles_that_have_partition_id, new_eles)
                     partition_id += 1
 
         eles_without_partition = np.setdiff1d(mesh.el_df.index.values, eles_that_have_partition_id)
-        if eles_without_partition.size is not 0:
+        if eles_without_partition.size != 0:
             for eleid in eles_without_partition:
                 nodeids = mesh.get_nodeids_by_elementids(eleid)
                 match_found = False
@@ -310,9 +310,9 @@ class PartitionedMeshComponentSeparator(PartitionedComponentSeparator):
                         check_neighbor(element, other_element):
                     partitions_neighbors += (other_element['partition_id'],)
             no_of_partitions += len(partitions_neighbors)
-            if len(partitions_neighbors) is 0:
+            if len(partitions_neighbors) == 0:
                 partitions_neighbors = None
-            elif len(partitions_neighbors) is 1:
+            elif len(partitions_neighbors) == 1:
                 partitions_neighbors = partitions_neighbors[0]
             else:
                 partitions_neighbors = list(partitions_neighbors)

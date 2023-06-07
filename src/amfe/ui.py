@@ -96,7 +96,7 @@ def create_material(material_type='Kirchhoff', **kwargs):
     if len(kwargs) == 0:
         logger = logging.getLogger(__name__)
         logger.debug('No material-parameters were given. I am setting them to default.')
-    if material_type is 'Kirchhoff':
+    if material_type == 'Kirchhoff':
         if 'E' in kwargs:
             E = kwargs['E']
         else:
@@ -119,7 +119,7 @@ def create_material(material_type='Kirchhoff', **kwargs):
             thickness = 1.0
 
         return KirchhoffMaterial(E, nu, rho, plane_stress, thickness)
-    elif material_type is 'MooneyRivlin':
+    elif material_type == 'MooneyRivlin':
         if 'A10' in kwargs:
             A10 = kwargs['A10']
         else:
