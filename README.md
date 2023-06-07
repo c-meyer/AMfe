@@ -6,24 +6,6 @@ AMfe - Finite Element Research Code at the Chair of Applied Mechanics
 
 This Finite Element Research code is developed, maintained and used by a part of the numerics group of AM.
 
-Coverage Report for Master:
-[![coverage report](https://gitlab.lrz.de/AM/AMfe/badges/master/coverage.svg)](https://gitlab.lrz.de/AM/AMfe/commits/master)
-
-Pipeline Status:
-[![pipeline status](https://gitlab.lrz.de/AM/AMfe/badges/master/pipeline.svg)](https://gitlab.lrz.de/AM/AMfe/commits/master)
-
-Wheel built for latest release (stable):
-[ AMfe_linux_x86_64.whl ](https://gitlab.lrz.de/AM/AMfe/-/jobs/artifacts/master/download?job=build_wheel_for_linux_master)
-
-Latest developer version (beta):
-[ AMfe_linux_x86_64.whl ](https://gitlab.lrz.de/AM/AMfe/-/jobs/artifacts/developer/download?job=build_wheel_for_linux_developer)
-
-
-**Important Info:** The project has been moved recently. So please update your remote via:
-
-    git remote set-url origin https://gitlab.lrz.de/AM/AMfe.git
-
-
 Overview:
 ---------
 
@@ -38,49 +20,36 @@ Installation of AMfe
 
 ### Development Version
 
-Before installing the AMfe package, check, if the latest python version and all necessary modules are installed.
-For managing the python packages, the **Python distribution Anaconda** is **highly recommended**.
+For managing python packages, the **Python distribution Anaconda** is **highly recommended**.
 It has a very easy and effective packaging system and can thus handle all Python sources needed for this project.
 For installation and usage of Anaconda checkout http://docs.continuum.io/anaconda/install#anaconda-install.
 
-The following packages should be installed for a development version via conda install command:
+The following packages should be installed before you install amfe:
 
-   - Python version 3.7 or higher
-   - `numpy`, `scipy`, `pandas`, `h5py`, `matplotlib`, `vtk==8.1.2`, `pytables`, `mkl`
-   - for fast fortran execution a running fortran compiler (e.g. gcc and gfortran)
+   - Python version 3.7 or greater
+   - `numpy`, `mkl`, `meson`, `meson-python`
+   - A fortran compiler (e.g. gfortran)
    - for building the documentation `sphinx`, `numpydoc`, `sphinx_rtd_theme`
-   - for testing `nose`, `coverage`
-   - for checking the code readability: `pylint`
+   - for testing `pytst`
+   - for checking the code readability: `flake8`
 
-I recommend to create a separate environment in anaconda for your amfe installation.
-Then you later have the opportunity to create a new environment for other projects that can have different
-requirements (such as python 2.7 instead 3.7). 
+We recommend to create a separate environment in anaconda for your amfe installation.
+Then, you have the opportunity to create a new environment for other projects that can have different
+requirements (such as python 2.7 instead 3.10). 
 
-For getting the package type
 
-    git clone https://gitlab.lrz.de/AM/AMfe.git
-
-in your console. Git will clone the repository into the current folder.
-For installing the package in development mode run
+For installing the package in development mode, clone the repository (via git clone) and run
 
     cd AMfe
-    conda create --name <environment-name-of-choice> python=3.7
+    conda create --name <environment-name-of-choice> python=3.10
     conda activate <environment-name-of-choice> 
-    python conda_setup.py
-    python setup.py develop [no_fortran]
+    python -m pip install --no-build-isolation --editable .
 
-in the main folder. The conda_setup.py file installs the dependencies via conda.
-It is recommended to install the dependencies with conda because setup.py can only install them via pip which
-can lead to an unclean conda environment.
+in the main folder.
 
-The `python setup.py develop` command builds the fortran routines and installs the python module in-place,
-i.e., when you do changes to the source code they will be used the next time the module is loaded.
-
-If you do not want to install the FORTRAN-routines, you can add the flag `no_fortran` to your installation command:
-
-    python setup_develop.py develop no_fortran
-
-If no FORTRAN-compiler is found, the installation will work only with the `no_fortran`-flag.
+This command automatically builds the fortran routines and installs them locally.
+Python-modules are installed in-place,
+i.e., when you apply changes to the source code, they will be used the next time the module is loaded.
 
 
 ### Production version
@@ -88,51 +57,40 @@ If no FORTRAN-compiler is found, the installation will work only with the `no_fo
 If you do not develop AMfe you can install AMfe with conda dependencies via
 
     cd AMfe
-    conda create --name <environment-name-of-choice> python=3.7
+    conda create --name <environment-name-of-choice> python=3.10
     conda activate <environment-name-of-choice> 
-    python conda_setup.py
-    python setup.py install [no_fortran]
-
-If you like to use pip for your installation the easiest installation is to download the latest
-wheel file
-[ AMfe_linux_x86_64.whl ](https://gitlab.lrz.de/AM/AMfe/-/jobs/artifacts/master/download?job=build_wheel_for_linux)
-and run
-
-    pip install AMfe_linux_x86_64.whl
-
+    python -m pip install .
 
 
 Documentation
 -------------
 
-The documentation of the latest master version can be found at
-[ https://am.pages.gitlab.lrz.de/AMfe/ ](https://am.pages.gitlab.lrz.de/AMfe/index.html)
-
-The documentation can also be built from source by going into the folder `docs/` and running
+The documentation can be built from source by changing into the folder `cd docs/` and running
 
     make html
 
+This requires to install sphinx (`conda install sphinx sphinx_rtd_theme numpydoc`) beforehand.
 The documentation will be built in the folder `docs/` available as html in `_build`.
 If the command above does not work, try to run `python setup.py build_sphinx` in the main-folder
 also builds the documentation.
 
 Workflow for Pre- and Postprocessing
 ------------------------------------
-Preprocessing and postprocessing is not part of the code AMfe, but the open source tools gmsh
+Preprocessing and postprocessing is not part of the code AMfe, but the open source tools gmsh, salome
 and Paraview are recommended:
 
-- [gmsh](http://gmsh.info) The open-source meshing tool can create unstructured meshes for 2D and 3D geometries. The geometry can either be built inside the tool or outside in a CAD program with the `.stp`-file imported into gmsh. In order to define volumes for materials or points/lines/surfaces for boundaries, physical groups must be assigned in gmsh.
-- [ParaView](http://www.paraview.org) With ParaView the results can be analyzed. For showing the displacements, usually it is very handy to apply the *Warp By Vector* filter to see the displaced configuration.
+- [gmsh](https://gmsh.info) The open-source meshing tool can create unstructured meshes for 2D and 3D geometries. The geometry can either be built inside the tool or outside in a CAD program with the `.stp`-file imported into gmsh. In order to define volumes for materials or points/lines/surfaces for boundaries, physical groups must be assigned in gmsh.
+- [salome](https://salome-platform.org) Salome-Meca is an open source preprocessor. You can export *.med files from Salome to be used in AMfe.
+- [ParaView](https://www.paraview.org) With ParaView the results can be analyzed. For showing the displacements, usually it is very handy to apply the *Warp By Vector* filter to see the displaced configuration.
 
 AMfe provides a Mesh-Exporter for the Preprocessor [GiD](http://www.gidhome.com/).
-This preprocessor can be downloaded as community edition or can be accessed at our chair.
-See the AM Wiki for more information how to access the professional edition at our chair.
+But this is not maintained anymore and will be deprecated in future.
+If you are interested in using this, checkout the gid folder in this repository.
 
 Hints
 -----
 
 #### Python and the Scientific Ecosystem
-
 
 Though Python is a general purpose programming language, it provides a great ecosystem for scientific computing.
 As resources to learn both, Python as a language and the scientific Python ecosystem,
@@ -142,11 +100,9 @@ As these topics are interesting for many people on the globe, lots of resources 
 ##### Python language:
 - [A byte of Python:](http://python.swaroopch.com/) A good introductory tutorial to Python. My personal favorite.
 - [Learn Python the hard way:](http://learnpythonthehardway.org/book/) good introductory tutorial to the programming language.
-- [Youtube: Testing in Python ](https://www.youtube.com/watch?v=FxSsnHeWQBY) This amazing talk explains the concept
-and the philosophy of unittests, which are used in the `amfe` framework.
 
 ##### Scientific Python Stack (numpy, scipy, matplotlib):
-- [Scipy Lecture Notes:](http://www.scipy-lectures.org/) Good and extensive lecture notes which are evolutionary improved online with very good reference on special topics, e.g. sparse matrices in `scipy`.
+- [Scipy Lecture Notes:](https://www.scipy-lectures.org/) Good and extensive lecture notes which are evolutionary improved online with very good reference on special topics, e.g. sparse matrices in `scipy`.
 - [Youtube: Talk about the numpy data type ](https://www.youtube.com/watch?v=EEUXKG97YRw) This amazing talk **is a must-see** for using `numpy` arrays properly. It shows the concept of array manipulations, which are very effective and powerful and extensively used in `amfe`.
 - [Youtube: Talk about color maps in matplotlib](https://youtu.be/xAoljeRJ3lU?list=PLYx7XA2nY5Gcpabmu61kKcToLz0FapmHu) This interesting talk is a little off-topic but cetainly worth to see. It is about choosing a good color-map for your diagrams.
 - [Youtube: Talk about the HDF5 file format and the use of Python:](https://youtu.be/nddj5OA8LJo?list=PLYx7XA2nY5Gcpabmu61kKcToLz0FapmHu) Maybe of interest, if the HDF5 data structure, in which the simulation data are extracted, is of interest. This video is no must-have.
@@ -162,12 +118,12 @@ and the philosophy of unittests, which are used in the `amfe` framework.
 #### IDEs:
 
 A good IDE to start with is Spyder, which has sort of a MATLAB-Style look and feel.
-It is part of anaconda ans provides nice features like built-in debugging, static code analysis with pylint and a
+It is part of anaconda and provides nice features like built-in debugging, static code analysis with pylint and a
 profiling tool to measure the performance of the code.
 
 Other editors integrate very well into Python like Atom.
 
-I personally work with PyCharm, which is an IDE for Python. However as it provides many functions one could be
+We work with PyCharm, which is an IDE for Python. However, as it provides many functions one could be
 overwhelmed by it at first. 
 
 ---------------------------------------
@@ -179,7 +135,7 @@ On Mac OS X `Spyder 2` may run very slow, as there are some issues with the grap
     conda install -c qttesting qt pyqt
     conda install -c spyder-ide spyder==3.0.0b6
    
-or (which worked better for me)
+or (which worked better for Johannes)
    
     pip install --pre -U spyder
 
@@ -199,4 +155,8 @@ in your console.
 
 
 #### Theory of Finite Elements
-The theory for finite elements is very well developed, though the knowledge is quite fragmented. When it comes to element technology for instance, good benchmarks and guidelines are often missed. A good guideline is the [Documentation of the CalculiX-Software-Package](http://web.mit.edu/calculix_v2.7/CalculiX/ccx_2.7/doc/ccx/ccx.html) which covers a lot about element technology, that is also used in AMfe. CalculiX is also an OpenSource Finite Element software written in FORTRAN an C++.
+The theory for finite elements is very well developed, though the knowledge is quite fragmented.
+When it comes to element technology for instance, good benchmarks and guidelines are often missed.
+A good guideline is the [Documentation of the CalculiX-Software-Package](http://web.mit.edu/calculix_v2.7/CalculiX/ccx_2.7/doc/ccx/ccx.html)
+which covers a lot about element technology, that is also used in AMfe.
+CalculiX is also an OpenSource Finite Element software written in FORTRAN an C++.
