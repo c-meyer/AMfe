@@ -38,17 +38,17 @@ if not statics:
     output_file += '_dynamics'
 else:
     output_file += '_statics'
-if scheme is 'GeneralizedAlpha':
+if scheme == 'GeneralizedAlpha':
     output_file += '_generalizedalpha'
-elif scheme is 'WBZAlpha':
+elif scheme == 'WBZAlpha':
     output_file += '_wbzalpha'
-elif scheme is 'HHTAlpha':
+elif scheme == 'HHTAlpha':
     output_file += '_hhtalpha'
-elif scheme is 'NewmarkBeta':
+elif scheme == 'NewmarkBeta':
     output_file += '_newmarkbeta'
-elif scheme is 'JWHAlpha':
+elif scheme == 'JWHAlpha':
     output_file += '_jwhalpha'
-elif scheme is 'JWHAlphaStateSpace':
+elif scheme == 'JWHAlphaStateSpace':
     output_file += '_jwhalphastatespace'
 
 
@@ -116,39 +116,39 @@ if scheme == 'JWHAlphaStateSpace':
 # solve system
 if not statics:
     if not linear:  # non-linear dynamics
-        if scheme is 'GeneralizedAlpha':
+        if scheme == 'GeneralizedAlpha':
             solver = amfe.GeneralizedAlphaNonlinearDynamicsSolver(mechanical_system=system, **options)
-        elif scheme is 'WBZAlpha':
+        elif scheme == 'WBZAlpha':
             solver = amfe.GeneralizedAlphaNonlinearDynamicsSolver(mechanical_system=system, **options)
             solver.set_wbz_alpha_parameters(rho_inf=rho_inf)
-        elif scheme is 'HHTAlpha':
+        elif scheme == 'HHTAlpha':
             solver = amfe.GeneralizedAlphaNonlinearDynamicsSolver(mechanical_system=system, **options)
             solver.set_hht_alpha_parameters(rho_inf=rho_inf)
-        elif scheme is 'NewmarkBeta':
+        elif scheme == 'NewmarkBeta':
             solver = amfe.GeneralizedAlphaNonlinearDynamicsSolver(mechanical_system=system, **options)
             solver.set_newmark_beta_parameters(beta=0.25*(1 + alpha)**2, gamma=0.5 + alpha)
-        elif scheme is 'JWHAlpha':
+        elif scheme == 'JWHAlpha':
             solver = amfe.JWHAlphaNonlinearDynamicsSolver(mechanical_system=system, **options)
-        elif scheme is 'JWHAlphaStateSpace':
+        elif scheme == 'JWHAlphaStateSpace':
             system = state_space_system
             solver = amfe.JWHAlphaNonlinearDynamicsSolverStateSpace(mechanical_system=system, **options)
         else:
             raise ValueError('Time integration scheme not supported!')
     else:  # linear dynamics
-        if scheme is 'GeneralizedAlpha':
+        if scheme == 'GeneralizedAlpha':
             solver = amfe.GeneralizedAlphaLinearDynamicsSolver(mechanical_system=system, **options)
-        elif scheme is 'WBZAlpha':
+        elif scheme == 'WBZAlpha':
             solver = amfe.GeneralizedAlphaLinearDynamicsSolver(mechanical_system=system, **options)
             solver.set_wbz_alpha_parameters(rho_inf=rho_inf)
-        elif scheme is 'HHTAlpha':
+        elif scheme == 'HHTAlpha':
             solver = amfe.GeneralizedAlphaLinearDynamicsSolver(mechanical_system=system, **options)
             solver.set_hht_alpha_parameters(rho_inf=rho_inf)
-        elif scheme is 'NewmarkBeta':
+        elif scheme == 'NewmarkBeta':
             solver = amfe.GeneralizedAlphaLinearDynamicsSolver(mechanical_system=system, **options)
             solver.set_newmark_beta_parameters(beta=0.25*(1 + alpha)**2, gamma=0.5 + alpha)
-        elif scheme is 'JWHAlpha':
+        elif scheme == 'JWHAlpha':
             solver = amfe.JWHAlphaLinearDynamicsSolver(mechanical_system=system, **options)
-        elif scheme is 'JWHAlphaStateSpace':
+        elif scheme == 'JWHAlphaStateSpace':
             system = state_space_system
             solver = amfe.JWHAlphaLinearDynamicsSolverStateSpace(mechanical_system=system, **options)
         else:

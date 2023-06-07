@@ -15,8 +15,8 @@ import os
 
 platform = sys.platform
 
-libname = {'linux': 'libmkl_rt.so',  # works for python3 on linux
-           'linux2': 'libmkl_rt.so',  # works for python2 on linux
+libname = {'linux': 'libmkl_rt.so.2',  # works for python3 on linux
+           'linux2': 'libmkl_rt.so.2',  # works for python2 on linux
            'darwin': 'libmkl_rt.dylib',
            'win32': 'mkl_rt.dll'}
 

@@ -25,6 +25,7 @@ import numpy as np
 import scipy as sp
 
 from scipy import sparse
+from amfe.assembly import fill_csr_matrix, get_index_of_csr_data
 
 
 class Assembly():

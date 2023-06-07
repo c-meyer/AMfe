@@ -76,7 +76,7 @@ class MappingBase(ABC):
         """
         if not isinstance(nodeids, Iterable):
             nodeids = [nodeids]
-        if fields is ('all'):
+        if fields == 'all' or fields == ('all',):
             fields = self._nodal2global.keys()
         return self._nodal2global.loc[nodeids, fields].values
 

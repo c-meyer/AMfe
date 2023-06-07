@@ -29,11 +29,11 @@ class DummyMapping:
         return np.where(self.node_ids == id)[0][0]
 
     def get_dofs_by_nodeids(self, loc_nodeid, field):
-        if field is 'ux':
+        if field == 'ux':
             return [self.N_dof_types*self._id2idx(loc_nodeid)]
-        elif field is 'uy':
+        elif field == 'uy':
             return [self.N_dof_types*self._id2idx(loc_nodeid) + 1]
-        elif field is 'uz':
+        elif field == 'uz':
             return [self.N_dof_types*self._id2idx(loc_nodeid) + 2]
 
 
