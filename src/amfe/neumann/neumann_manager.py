@@ -78,11 +78,11 @@ class NeumannManager:
              'fk_neumann_df': np.ones(len(neumann_objects), dtype=np.intp) * dfindex,
              'fk_mapping': -1*np.ones(len(neumann_objects), dtype=np.intp)}
         )
-        self._neumann_obj_df = self._neumann_obj_df.append(df, ignore_index=True, verify_integrity=True)
+        self._neumann_obj_df = pd.concat([self._neumann_obj_df, df], ignore_index=True, verify_integrity=True)
 
         # Create entry for neumann_df describing the whole b.c.
         df_data = {'name': name, 'tag': tag, 'property_names': [property_names], 'neumann_obj': neumannobj}
-        self._neumann_df = self._neumann_df.append(pd.DataFrame(df_data, index=[dfindex]), sort=True)
+        self._neumann_df = pd.concat([self._neumann_df, pd.DataFrame(df_data, index=[dfindex])], sort=True)
 
     @property
     def el_df(self):

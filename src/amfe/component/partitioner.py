@@ -208,16 +208,16 @@ class PartitionedMeshComponentSeparator(PartitionedComponentSeparator):
             for node in nodeids_full:
                 if node in nodes_mapping['global_nodeid'].values:
                     new_node = mesh.copy_node_by_id(node)
-                    nodes_mapping = nodes_mapping.append(
-                        {'partition_id': partition_id, 'global_nodeid': node, 'local_nodeid': new_node},
+                    nodes_mapping = pd.concat([nodes_mapping, pd.DataFrame(
+                        [{'partition_id': partition_id, 'global_nodeid': node, 'local_nodeid': new_node}])],
                         ignore_index=True)
                     groups_node = mesh.get_groups_by_nodeids(node)
                     mesh.add_node_to_groups(new_node, groups_node)
 
                     mesh.update_connectivity_with_new_node(node, new_node, ele_ids)
                 else:
-                    nodes_mapping = nodes_mapping.append(
-                        {'partition_id': partition_id, 'global_nodeid': node, 'local_nodeid': node}, ignore_index=True)
+                    nodes_mapping = pd.concat([nodes_mapping, pd.DataFrame(
+                        [{'partition_id': partition_id, 'global_nodeid': node, 'local_nodeid': node}])], ignore_index=True)
 
         return mesh, nodes_mapping
 

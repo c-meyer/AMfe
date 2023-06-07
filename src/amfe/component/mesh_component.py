@@ -133,7 +133,7 @@ class MeshComponent(ComponentBase):
         new_df = pd.DataFrame({'physics': [physics]*len(ele_shapes), 'fk_mesh': eleids,
                                'ele_obj': [prototypes[ele_shape] for ele_shape in ele_shapes],
                                'fk_mapping': np.ones(len(ele_shapes), dtype=np.intp)*-1})
-        self._ele_obj_df = self._ele_obj_df.append(new_df, ignore_index=True)
+        self._ele_obj_df = pd.concat([self._ele_obj_df, new_df], ignore_index=True)
         self._ele_obj_df = self._ele_obj_df.sort_index()
         self._ele_obj_df['fk_mapping'] = self._ele_obj_df['fk_mapping'].astype(np.intp)
         self._ele_obj_df['fk_mesh'] = self._ele_obj_df['fk_mesh'].astype(np.intp)

@@ -21,15 +21,15 @@ from amfe.solver.nonlinear_solver import NewtonRaphson
 # All rights reserved.
 def F(x):
     x = np.asmatrix(x).T
-    d = np.matrix(np.diag([3, 2, 1.5, 1, 0.5]))
+    d = np.diag([3, 2, 1.5, 1, 0.5])
     c = 0.01
-    f = d*x + c*float(x.T*x)*x
+    f = d @ x + c*np.outer(x, x)@x
     return f
 # End of Scipy function
 
 
 def jac(x):
-    d = np.matrix(np.diag([3, 2, 1.5, 1, 0.5]))
+    d = np.diag([3, 2, 1.5, 1, 0.5])
     c = 0.01
     j = d + c*float()
     return j
@@ -38,7 +38,7 @@ def jac(x):
 class NonlinearTest(TestCase):
     def test_newton_raphson_solver(self):
         solver = NewtonRaphson()
-        x0 = np.array([1,1,1,1,1], dtype=float)
+        x0 = np.array([1, 1, 1, 1, 1], dtype=float)
         atol = 1e-6
         options = {'maxiter': 200, 'atol': atol}
         x, _ = solver.solve(F, x0, (), jac, options=options)

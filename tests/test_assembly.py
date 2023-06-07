@@ -5,10 +5,7 @@ from unittest import TestCase
 from scipy.sparse import csr_matrix
 from numpy.random import randint
 import numpy as np
-from scipy import rand
 from numpy.testing import assert_array_equal
-import pandas as pd
-from pandas.testing import assert_frame_equal
 
 from amfe.assembly.assembly import Assembly
 from amfe.assembly import StructuralAssembly
@@ -26,7 +23,7 @@ class AssemblyToolsTest(TestCase):
         N = int(10)
         row = randint(0, N, N)
         col = randint(0, N, N)
-        val = rand(N)
+        val = np.random.rand(N)
         A = csr_matrix((val, (row, col)))
         # print('row:', row, '\ncol:', col)
         for i in range(N):

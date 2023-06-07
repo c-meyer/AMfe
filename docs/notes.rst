@@ -73,7 +73,7 @@ How to plot matrices in matplotlib:
 
 >>> import matplotlib as mpl
 >>> from matplotlib import pyplot as plt; import scipy as sp
->>> A = sp.random.rand(10, 10)
+>>> A = np.random.rand(10, 10)
 >>> plt.matshow(A)
 >>> # In order to plot in log scale:
 >>> plt.matshow(A, norm=mpl.colors.LogNorm())
