@@ -8,6 +8,7 @@
 *.o
 *.vtu
 *.pvd
+*.whl
 *~
 
 # ignore mesh files because they can be large
