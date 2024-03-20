@@ -1,0 +1,9 @@
+========================
+AMfe 1.3.0 Release Notes
+========================
+
+Highlights of this release
+--------------------------
+
+- We have migrated the CI pipeline to github actions. Old CI systems have been deprecated.
+- The build system has changed from setuptools/distutils to pip and meson.

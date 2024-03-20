@@ -4,6 +4,16 @@ CONTRIBUTING
 This document gives an overview over how you can contribute to the AMfe.
 
 
+Install DEV Environment
+-----------------------
+
+Create a conda environment, install the build dependencies that are listed in pyproject.toml and run
+the following command:
+```
+python -m pip install --no-build-isolation --editable .
+```
+
+
 Issue Reporting
 ---------------
 
@@ -11,8 +21,7 @@ The easiest thing you can contribute is reporting issues.
 If you realize a bug you can report the issue on the issues section.
 Please write an exact description of a bug.
 Include a minimal example or better a minimal unit test in the issue description
-which would fail due to the bug. This would be the best practise to report
-an issue.  
+which would fail due to the bug.
 
 Bug Fixing
 ----------
@@ -33,17 +42,16 @@ Checklist:
 - [ ] Check if your code is PEP8 conform. Most IDEs have settings that can help you checking this.
 - [ ] Check if your new code has a docstring following the numpydoc conventions
 - [ ] Check if your function's docstring is added in the docs (reference API docs)
-- [ ] If it is a new function, tag with .. versionadded::X.Y.Z with X.Y.Z the version number of the next release 
-which can be found in setup.py
+- [ ] If it is a new function, tag with .. versionadded::X.Y.Z with X.Y.Z the version number of the next release.
 - [ ] Add your name with a comment what you have fixed in the THANKS.txt (This is voluntary,
 but really desired to give every author credit)
 - [ ] Add a release-note in the X.Y.Z-notes.txt (in docs/release where X.X.X stands for the next released version)
 - [ ] If it is a new major function, perhaps add a tutorial/example etc. in the main documentation
 - [ ] Check that the code you use is BSD license compatible! If it is your own code, note that
 you accept the BSD license conditions
-- [ ] If you used compiled code or a package from a private repo, is it correctly introduced in setup.py?
+- [ ] If you used compiled code or a package from a private repo, is it correctly introduced in meson.build files?
 
-Afterwards you can ask a reviewer to review your code. Afterwards, the maintainer (currently Christian Meyer)
+Afterwards, you can ask a reviewer to review your code. The maintainer (currently Christian Meyer)
 decides over the final merge. 
 
 New Features
@@ -52,8 +60,8 @@ New Features
 In general, AMfe is a code that is often used for research. It also provides methods that are quite new or
 still in research. However, if you try out a new method you use, this is ok in your own private branches,
 but it is not intended to become directly a main feature of AMfe. AMfe does only contain features that
-are tested and useful in that sense that research results show its benefit. Thus the usual workflow is:
-Checkout your private branche, do your research, make your publications and if you can show, it is a useful
+are tested and useful in that sense that research results show its benefit. Thus, the usual workflow is:
+Checkout your private branch, do your research, make your publications and if you can show, it is a useful
 method, you can propose a separate merge request where only the new well working method is proposed to merge.
 This is highly desired, of course. In contrast, untested or even not working features are not welcome.
 
@@ -64,7 +72,7 @@ branch as parent. There, many Merge Requests can be done until the feature is wo
 Review
 ------
 
-Each Merge Request into developer branch or master merge MUST be reviewed. Other branches are review free.
+Each Merge Request into master MUST be reviewed.
 Reviewers should ask themselves the following questions when reviewing:
 
 - Was this change discussed in the community in case of new functions/features.
@@ -81,9 +89,9 @@ any tests that show the performance of the code
 Testing
 -------
 
-To test your code use nosetests. You need to install the nose python package.
-Afterwards you can run nosetests inside the AMfe directory.
-Write a test in your test_folder, check if nosetests recognizes it (you have to ensure that
-your methods start with the 'test_' prefix) and if it passes.
+To test your code, use pytest. You need to install the pytest python package first.
+Afterwards, you can run `pytest` inside the AMfe directory.
+Write a test in your test_folder, check if pytest finds it (you have to ensure that
+your methods start with the 'test_' prefix) and check your test passes.
 
-Use coverage.py to check if your tests cover all lines of your new developed/bugfixed functions.
+Check if your tests cover all lines of your new developed/bugfixed functions (coverage.py can help).
