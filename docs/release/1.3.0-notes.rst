@@ -7,3 +7,8 @@ Highlights of this release
 
 - We have migrated the CI pipeline to github actions. Old CI systems have been deprecated.
 - The build system has changed from setuptools/distutils to pip and meson.
+
+Elements
+--------
+
+- A linear spring element for geometric nonlinear formulation has been added to elements.py module.

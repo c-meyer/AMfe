@@ -40,6 +40,7 @@ from .hexa8 import *
 from .hexa20 import *
 from .bar_2d_lumped import *
 from .linear_beam import *
+from .linear_spring import *
 
 #     --- boundary ---
 # from .boundary_element import *  # super class
