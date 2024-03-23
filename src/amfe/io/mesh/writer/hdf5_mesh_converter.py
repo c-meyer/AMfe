@@ -2,10 +2,11 @@
 #
 # Distributed under BSD-3-Clause License. See LICENSE-File for more information
 #
+import enum
 
 import numpy as np
 import pandas as pd
-from tables import *
+import h5py
 import xml.etree.ElementTree as ET
 from os.path import basename, splitext
 
@@ -19,11 +20,29 @@ __all__ = [
     ]
 
 
+def write_hdf5_table(fp, arr, path):
+    # arr = np.array(range(6), dtype=np.float32).reshape(3, 2)
+    dt = np.dtype([('etype', 'S14'), ('etype_index', np.uint32), ('index', np.uint32)])
+    # arr = np.array([("quadratic_line", 1, 5),
+#                    ("Tri6", 2, 12)], dtype=dt)
+    dset = fp.create_dataset(path, (len(arr),), dtype=dt, data=arr)
+    dset.attrs.create("CLASS", "TABLE")
+    dset.attrs.create("VERSION", "0.2")
+    dset.attrs.create("TITLE", "Element IDs")
+    dset.attrs.create("FIELD_0_NAME", "etype")
+    dset.attrs.create("FIELD_0_FILL", b'')
+    dset.attrs.create("FIELD_1_NAME", "etype_index")
+    dset.attrs.create("FIELD_1_FILL", 0, dtype=np.uint32)
+    dset.attrs.create("FIELD_2_NAME", "index")
+    dset.attrs.create("FIELD_2_FILL", 0, dtype=np.uint32)
+    dset.attrs.create("NROWS", len(arr))
+
+
 class Hdf5MeshConverter(MeshConverter):
     """
     MeshConverter to HDF5 files
     """
-    class Preallocation(Enum):
+    class Preallocation(enum.Enum):
         PREALLOCATED = 1
         NOTPREALLOCATED = 2
         UNKNOWN = 0
@@ -126,7 +145,7 @@ class Hdf5MeshConverter(MeshConverter):
         data = {'shape': self._eleshapes,
                 'connectivity': self._connectivity}
         self._el_df = pd.DataFrame(data, index=self._ele_indices)
-        # introduce row values for each shape. The row values will map to the row entries in an separate array for each
+        # introduce row values for each shape. The row values will map to the row entries in a separate array for each
         # elementtype
         etypes_in_el_df = self._el_df['shape'].unique()
         self._el_df['row'] = None
@@ -157,38 +176,41 @@ class Hdf5MeshConverter(MeshConverter):
             self._tag_names.extend([tag_name])
             self._tags[tag_name].update({'name2scalars': name2scalars})
 
-    @check_filename_or_filepointer(File, open_file, 1, writeable=True)
+    @check_filename_or_filepointer(h5py._hl.files.File, h5py.File, 1, writeable=True)
     def _write_hdf5(self, hdf_fp):
         # write hdf5 file and xdmf file
         # create mesh group
-        group_mesh = hdf_fp.create_group('/', 'mesh', 'Mesh')
-        hdf_fp.create_array(group_mesh, 'MESH_VERSION', np.array([str(self._version)]))
-        hdf_fp.create_array(group_mesh, 'nodes', self._nodes_df[['x', 'y', 'z']].values,
-                            title='Node Coordinates',
-                            shape=self._nodes_df[['x', 'y', 'z']].values.shape)
-        hdf_fp.create_array(group_mesh, 'nodeids', self._nodes_df.index.values, title='Node IDs')
-        group_elements = hdf_fp.create_group(group_mesh, 'topology', 'Topology')
-        group_tags = hdf_fp.create_group(group_mesh, 'tags', 'Tags')
+        group_mesh = hdf_fp.create_group("/mesh")
+        group_mesh.attrs.create("TITLE", "Mesh")
+        group_mesh.create_dataset("MESH_VERSION", data=str(self._version))
+
+        nodes_values = self._nodes_df[['x', 'y', 'z']].values
+        nodes_ds = group_mesh.create_dataset("nodes", data=nodes_values, shape=nodes_values.shape)
+        nodes_ds.attrs.create("TITLE", "Node Coordinates")
+
+        nodeids_ds = group_mesh.create_dataset("nodeids", data=self._nodes_df.index.values)
+        nodeids_ds.attrs.create("TITLE", "Node IDs")
+
+        group_elements = group_mesh.create_group("topology")
+        group_elements.attrs.create("TITLE", "Topology")
+
+        group_tags = group_mesh.create_group("tags")
+        group_tags.attrs.create("TITLE", "Tags")
+
         tag_group_pointers = dict()
         for tag in self._tag_names:
-            tag_group = hdf_fp.create_group(group_tags, tag)
+            tag_group = group_tags.create_group(tag)
             tag_group_pointers.update({tag: tag_group})
 
-        description = {'index': UInt32Col(),
-                       'etype': StringCol(itemsize=18),
-                       'etype_index': UInt32Col()}
-
-        eleid_table = hdf_fp.create_table(group_mesh, 'elementids', description, 'Element IDs')
-        row = eleid_table.row
+        dt = np.dtype([('etype', 'S14'), ('etype_index', np.uint32), ('index', np.uint32)])
+        rows = []
 
         # write topology for each element
         for etype in self._el_df['shape'].unique():
             el_df_by_shape = self._el_df[self._el_df['shape'] == etype]
             for counter, (index, item) in enumerate(el_df_by_shape['shape'].items()):
-                row['index'] = index
-                row['etype'] = item
-                row['etype_index'] = counter
-                row.append()
+                rows.append((item, counter, index))
+
             connectivity_of_current_etype = el_df_by_shape['connectivity'].values
             no_of_elements_of_current_etype = len(connectivity_of_current_etype)
             no_of_nodes_per_element = connectivity_of_current_etype[0].shape[1]
@@ -198,8 +220,8 @@ class Hdf5MeshConverter(MeshConverter):
                                       dtype=int)
                 connectivity_array = connectivity_array[:, reordering]
             if no_of_elements_of_current_etype > 0:
-                hdf_fp.create_array(group_elements, etype, connectivity_array.astype(int),
-                                    shape=(no_of_elements_of_current_etype, no_of_nodes_per_element))
+                group_elements.create_dataset(etype, data=connectivity_array.astype(int),
+                                              shape=(no_of_elements_of_current_etype, no_of_nodes_per_element))
 
             for tag in self._tag_names:
                 # write values for each element type
@@ -208,27 +230,28 @@ class Hdf5MeshConverter(MeshConverter):
                 else:
                     default = self._tags[tag]['default']
                 tag_values = el_df_by_shape[tag].fillna(default).values
-                hdf_fp.create_array(tag_group_pointers[tag], etype, tag_values.astype(self._tags[tag]['dtype']), shape=tag_values.shape)
+                tag_group_pointers[tag].create_dataset(etype, data=tag_values.astype(self._tags[tag]['dtype']),
+                                                       shape=tag_values.shape)
 
-        eleid_table.flush()
-
+        row_arr = np.array(rows, dtype=dt)
+        write_hdf5_table(hdf_fp, row_arr, "/mesh/elementids")
 
 def write_xdmf_mesh_from_hdf5(xdmffilename, hdffilename, meshroot):
     # get Infos from hdf5
     def get_infos_from_hdf(fp):
-        rno_of_nodes = fp.get_node(meshroot + '/nodes').shape[0]
-        topologynode = fp.get_node(meshroot + '/topology')
+        rno_of_nodes = fp[meshroot + '/nodes'].shape[0]
+        topologynode = fp[meshroot + '/topology']
         relementsshape_by_etype = dict()
-        for etype in fp.list_nodes(topologynode, classname='Array'):
-            relementsshape_by_etype.update({etype.name: etype.shape})
-        tagsnode = fp.get_node(meshroot + '/tags')
-        rtags = [rtag._v_name for rtag in fp.list_nodes(tagsnode, classname='Group')]
+        for etype in topologynode.keys():
+            relementsshape_by_etype.update({etype: topologynode[etype].shape})
+        tagsnode = fp[meshroot + '/tags']
+        rtags = [rtag for rtag in tagsnode.keys()]
         return rno_of_nodes, relementsshape_by_etype, rtags
 
     if isinstance(hdffilename, str):
-        with open_file(hdffilename, 'r') as hdffp:
+        with h5py.File(hdffilename, 'r') as hdffp:
             no_of_nodes, elementsshape_by_etype, tags = get_infos_from_hdf(hdffp)
-    elif isinstance(hdffilename, File):
+    elif isinstance(hdffilename, h5py._hl.files.File):
         no_of_nodes, elementsshape_by_etype, tags = get_infos_from_hdf(hdffilename)
     else:
         raise ValueError('hdffilename must be either a valid filename or a tables.File object')
