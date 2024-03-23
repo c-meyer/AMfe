@@ -58,6 +58,33 @@ class Material:
             observer.update()
 
 
+class LinearSpringMaterial(Material):
+    """
+    Class to define stiffness and mass properties of a linear spring element for geometric nonlinear simulations.
+
+    A linear spring is defined by its stiffness and two mass properties.
+    The first mass property describes the mass at the first elemental node,
+    the second mass property describes the mass at the second elemental node.
+    """
+    def __init__(self, stiffness, mass1, mass2):
+        """
+        Constructor for linear spring material.
+
+        Parameters
+        ----------
+        stiffness: float
+            Linear stiffness of the spring.
+        mass1:
+            Mass that is located at the first node of the element.
+        mass2:
+            Mass that is located at the second node of the element.
+        """
+        super().__init__()
+        self.stiffness = stiffness
+        self.mass1 = mass1
+        self.mass2 = mass2
+
+
 class ShellMaterial(Material):
     """
     Base class for Elements that have kinematic constraints between rotation and displacement dofs

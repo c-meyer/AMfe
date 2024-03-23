@@ -12,3 +12,8 @@ Elements
 --------
 
 - A linear spring element for geometric nonlinear formulation has been added to elements.py module.
+
+Materials
+---------
+
+- LinearSpringMaterial has been added to material module. It describes the properties of a linear spring element.

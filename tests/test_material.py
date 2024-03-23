@@ -9,7 +9,7 @@ from unittest import TestCase
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from amfe.material import BeamMaterial
+from amfe.material import BeamMaterial, LinearSpringMaterial
 
 
 class TestBeamMaterial(TestCase):
@@ -42,3 +42,13 @@ class TestBeamMaterial(TestCase):
         self.assertEqual(mat.I_p, I_p_desired)
         self.assertEqual(mat.J_x, J_x_desired)
         assert_array_equal(mat.X3, np.array(X3_desired, dtype=float))
+
+
+def test_linear_spring_material_should_return_passed_parameters():
+    stiffness = 5.0
+    mass1 = 3.0
+    mass2 = 2.5
+    spring = LinearSpringMaterial(stiffness, mass1, mass2)
+    assert spring.stiffness == stiffness
+    assert spring.mass1 == mass1
+    assert spring.mass2 == mass2
