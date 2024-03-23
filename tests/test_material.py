@@ -9,9 +9,7 @@ from unittest import TestCase
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from amfe.material import BeamMaterial
-
-from material import LinearSpringMaterial
+from amfe.material import BeamMaterial, LinearSpringMaterial
 
 
 class TestBeamMaterial(TestCase):
