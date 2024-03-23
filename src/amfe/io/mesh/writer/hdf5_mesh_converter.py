@@ -254,7 +254,7 @@ def write_xdmf_mesh_from_hdf5(xdmffilename, hdffilename, meshroot):
     elif isinstance(hdffilename, h5py._hl.files.File):
         no_of_nodes, elementsshape_by_etype, tags = get_infos_from_hdf(hdffilename)
     else:
-        raise ValueError('hdffilename must be either a valid filename or a tables.File object')
+        raise ValueError('hdffilename must be either a valid filename or a h5py.File object')
 
     relative_hdf5_path = splitext(basename(hdffilename))[0]
     with open(xdmffilename, 'wb') as xdmf_fp:
