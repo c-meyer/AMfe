@@ -6,7 +6,7 @@
 #
 
 import numpy as np
-from tables import File as PytablesFile, open_file, Group, Array
+import h5py
 
 from amfe.io import check_filename_or_filepointer, MeshEntityType, PostProcessDataType
 from amfe.io.mesh import Hdf5MeshReader
@@ -25,7 +25,7 @@ class AmfeHdf5PostProcessorReader(PostProcessorReader):
 
         Parameters
         ----------
-        hdf5filename : tables.File or str
+        hdf5filename : h5py.File or str
             path to hdf5 file that shall be read
         meshrootpath : str
             hdf5-path to the mesh information (should contain nodes array and topology folder with arrays
@@ -56,14 +56,14 @@ class AmfeHdf5PostProcessorReader(PostProcessorReader):
         """
         return self._parse(self._filename, builder)
 
-    @check_filename_or_filepointer(PytablesFile, open_file, 1, writeable=False)
+    @check_filename_or_filepointer(h5py._hl.files.File, h5py.File, 1, writeable=False)
     def _parse(self, hdf5fp, builder):
         """
 
         Parameters
         ----------
-        hdf5fp : tables.File
-            tables.File object that is parsed
+        hdf5fp : h5py.File
+            h5py.File object that is parsed
         builder : amfe.io.postprocessor.PostProcessorWriter
             builder that is used for building the desired object
 
@@ -79,36 +79,36 @@ class AmfeHdf5PostProcessorReader(PostProcessorReader):
         # -- End Mesh Conversion --
 
         # Retrieve the group in HDF5-file containing the results data
-        resultsgroup = hdf5fp.get_node(self._resultsrootpath)
+        resultsgroup = hdf5fp[self._resultsrootpath]
 
         # If write_only is None: Build a list with all fields that are contained in the file
         if self._write_only is None:
-            self._write_only = [node._v_name for node in resultsgroup]
+            self._write_only = list(resultsgroup.keys())
             if 'timesteps' in self._write_only:
                 self._write_only.remove('timesteps')
 
         # Retrieve the timesteps belonging to the results data
-        timesteps = hdf5fp.get_node(self._resultsrootpath + '/timesteps').read()
+        timesteps = hdf5fp[self._resultsrootpath + '/timesteps'][...]
         for fieldname in self._write_only:
             # Get the fieldnode
-            fieldnode = hdf5fp.get_node(self._resultsrootpath + '/' + fieldname)
+            fieldnode = hdf5fp[self._resultsrootpath + '/' + fieldname]
+
 
             # Element field information are stored in a folder, node information directly in an array.
             # Thus check the fieldnode instance if it is a Group (-> element info) or an array (-> probably node info)
-            if isinstance(fieldnode, Group):
+            is_dataset = isinstance(fieldnode, h5py.Dataset)
+            if is_dataset:
+                mesh_entity_type = MeshEntityType.NODE
+                field_type = PostProcessDataType[fieldnode.attrs.get('data_type')]
+            else:
                 mesh_entity_type = MeshEntityType.ELEMENT
                 # Field type still unknown because it is stored in the arrays inside the Group
                 field_type = None
-            elif isinstance(fieldnode, Array):
-                mesh_entity_type = MeshEntityType.NODE
-                field_type = PostProcessDataType[fieldnode.attrs['data_type']]
-            else:
-                raise ValueError('mesh_entity_type unknown')
 
             # -- Build data and index information --
             if mesh_entity_type == MeshEntityType.NODE:
                 # get indices and data
-                data = fieldnode.read()
+                data = fieldnode[...]
                 index = mesh['nodes'].index.values
 
             elif mesh_entity_type == MeshEntityType.ELEMENT:
@@ -120,15 +120,16 @@ class AmfeHdf5PostProcessorReader(PostProcessorReader):
                 data = np.empty((no_of_elements, no_of_timesteps))
                 data[:] = np.nan
                 # For each element type is a separate array
-                for etype_node in hdf5fp.iter_nodes(fieldnode, classname='Array'):
-                    # Now we are inside the group and can get field_type information.
-                    # It is assumed that it is consistent and equal in all arrays
-                    field_type = PostProcessDataType[etype_node.attrs['data_type']]
-                    etype = etype_node._v_name
-                    etype_array = etype_node.read()
-                    etype_indices = el_df[el_df['shape'] == etype].index.values
-                    iloc = el_df.loc[etype_indices, 'iconnectivity'].values
-                    data[iloc, :] = etype_array
+                for etype_node in fieldnode.keys():
+                    if isinstance(fieldnode[etype_node], h5py.Dataset):
+                        # Now we are inside the group and can get field_type information.
+                        # It is assumed that it is consistent and equal in all arrays
+                        field_type = PostProcessDataType[fieldnode[etype_node].attrs.get('data_type')]
+                        etype = etype_node
+                        etype_array = fieldnode[etype_node][...]
+                        etype_indices = el_df[el_df['shape'] == etype].index.values
+                        iloc = el_df.loc[etype_indices, 'iconnectivity'].values
+                        data[iloc, :] = etype_array
                 isnotnan = ~np.isnan(data[:, 0])
                 index = index[isnotnan]
                 data = data[isnotnan]
