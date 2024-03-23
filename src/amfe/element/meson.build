@@ -8,6 +8,7 @@ python_sources = [
   'line_linear_boundary.py',
   'line_quadratic_boundary.py',
   'linear_beam.py',
+  'linear_spring.py'
   'prism6.py',
   'quad4.py',
   'quad4_boundary.py',
