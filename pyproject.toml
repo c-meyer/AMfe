@@ -23,7 +23,6 @@ dependencies = [
     "h5py",
     "matplotlib",
     "vtk",
-    "tables",
     "mkl",
     "sphinx",
     "sphinx_rtd_theme",

@@ -21,7 +21,7 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
         meshreader : amfe.io.mesh_reader.MeshReader
             MeshReader object that can parse the mesh information of the Postprocessor Data
         filename : str or table.File
-            HDF5-filename or tables.File object where the converted data shall be stored to
+            HDF5-filename or h5py.File object where the converted data shall be stored to
         rootpath : str
             str describing the HDF5-path where the results shall be written to (default: '/results')
         verbose_rootname : str
@@ -67,7 +67,7 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
 
         Returns
         -------
-        filename : str or tables.File
+        filename : str or h5py.File
         """
         return self._filename
 
