@@ -103,10 +103,10 @@ def check_filename_or_filepointer(ftype, open_func, argindex=0, writeable=False)
     Parameters
     ----------
     ftype : class
-        class of a FileObject that is accepted, e.g. tables.File or just File (for Pythons File implementation).
+        class of a FileObject that is accepted, e.g. h5py.File or just File (for Pythons File implementation).
     open_func : function
         Handle to a function that can open the file and returns the right filepointer for the function that is decorated
-        e.g. open, or tables.open_file
+        e.g. open, or h5py.File
     argindex : int
         integer that describes at which position the filepointer argument is assumed in the decorated function
     writeable : bool (default: False)
@@ -144,6 +144,6 @@ def check_filename_or_filepointer(ftype, open_func, argindex=0, writeable=False)
                 new_args.extend(args[argindex + 1:])
                 return fun(*new_args, **kwargs)
             else:
-                raise ValueError('Filename must be valid path string or tables.File object')
+                raise ValueError('Filename must be valid path string or h5py.File object')
         return func_wrapper
     return fp_decorator

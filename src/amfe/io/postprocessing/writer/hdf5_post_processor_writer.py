@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from tables import File as PytablesFile, open_file
+import h5py
 
 from amfe.io.postprocessing.base import PostProcessorWriter
 from .. import MeshEntityType, PostProcessDataType
@@ -71,13 +71,13 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
         """
         return self._filename
 
-    @check_filename_or_filepointer(PytablesFile, open_file, 1, writeable=True)
+    @check_filename_or_filepointer(h5py._hl.files.File, h5py.File, 1, writeable=True)
     def _write_field(self, fp, name, field_type, t, data, index, mesh_entity_type):
         """
         Parameters
         ----------
-        fp : tables.File
-            tables.File object to write field into
+        fp : h5py.File
+            h5py.File object to write field into
         name : str
             Name for the field to write
         field_type : PostProcessDataType
@@ -100,16 +100,18 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
 
         # Create root path for results if necessary
         if self._rootpath not in fp:
-            resultsroot = fp.create_group('/', self._rootpath[1:], self._verbose_rootname)
+            resultsroot = fp.create_group('/' + self._rootpath[1:])
+            resultsroot.attrs.create("TITLE", self._verbose_rootname)
         else:
-            resultsroot = fp.get_node(self._rootpath)
+            resultsroot = fp[self._rootpath]
 
         # Create timesteps if not written before, otherwise check if it is consistent with current timesteps
         if 'timesteps' not in resultsroot:
             timesteps = np.array(t).astype(float)
-            fp.create_array(resultsroot, 'timesteps', timesteps, 'Timesteps', shape=timesteps.shape)
+            timesteps_ds = resultsroot.create_dataset('timesteps', data=timesteps, shape=timesteps.shape)
+            timesteps_ds.attrs.create("TITLE", "Timesteps")
         else:
-            if not np.array_equal(fp.get_node(resultsroot, 'timesteps', classname='Array').read(), np.array(t)):
+            if not np.array_equal(resultsroot['timesteps'][...], np.array(t)):
                 raise ValueError('The timesteps of the current field is not compatible with the timesteps of'
                                  'already written field within this group')
 
@@ -117,7 +119,7 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
         if mesh_entity_type == MeshEntityType.ELEMENT:
             # Element data must be stored within a folder containing separate arrays for each shape
             # Thus create this folder:
-            fieldgroup = fp.create_group(resultsroot, name)
+            fieldgroup = resultsroot.create_group(name)
 
             # Get the Element Dataframe from the mesh
             el_df = self._mesh_container['elements']
@@ -152,9 +154,10 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
                 arr_to_write[igoal, :] = data[isource, :]
 
                 # write the array for current etype into the hdf5 and its attribute information
-                dataset = fp.create_array(fieldgroup, etype, arr_to_write, name, shape=arr_to_write.shape)
-                dataset.attrs.data_type = field_type.name
-                dataset.attrs.mesh_entitiy_type = mesh_entity_type.name
+                dataset = fieldgroup.create_dataset(etype, data=arr_to_write, shape=arr_to_write.shape)
+                dataset.attrs.create("TITLE", name)
+                dataset.attrs.create("data_type", field_type.name)
+                dataset.attrs.create("mesh_entitiy_type", mesh_entity_type.name)
 
         # -- PROCEDURE FOR NODE DATA --
         else:
@@ -169,9 +172,9 @@ class Hdf5PostProcessorWriter(PostProcessorWriter):
             else:
                 raise NotImplementedError('Field Data Type {} is not supported for converting'.format(field_type.name))
 
-            dataset = fp.create_array(resultsroot, name, data)
-            dataset.attrs.data_type = field_type.name
-            dataset.attrs.mesh_entitiy_type = mesh_entity_type.name
+            dataset = resultsroot.create_dataset(name, data=data)
+            dataset.attrs.create("data_type", field_type.name)
+            dataset.attrs.create("mesh_entitiy_type", mesh_entity_type.name)
         self._written_fields.add(name)
 
     def _write_mesh(self):
