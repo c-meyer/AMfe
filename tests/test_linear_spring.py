@@ -4,8 +4,10 @@ from amfe.element import LinearSpring3D
 
 
 class DummySpringMaterial:
-    def __init__(self, stiffness):
+    def __init__(self, stiffness, mass1, mass2):
         self.stiffness = stiffness
+        self.mass1 = mass1
+        self.mass2 = mass2
 
 
 def jacobian(func, X, u, t):
@@ -27,8 +29,10 @@ def jacobian(func, X, u, t):
 
 def test_linear_spring_should_return_hook_force_in_initial_configuration():
     k = 3.0
+    m1 = 1.0
+    m2 = 2.0
     delta_l = 2.0
-    m = DummySpringMaterial(k)
+    m = DummySpringMaterial(k, m1, m2)
     spring = LinearSpring3D(m)
     X = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
     u = np.array([0.0, 0.0, 0.0, delta_l, 0.0, 0.0])
@@ -43,7 +47,9 @@ def test_linear_spring_should_return_zero_force_for_rigid_body_motion():
     direction = np.random.rand(3)
     direction = direction / np.linalg.norm(direction)
     k = 3.0
-    m = DummySpringMaterial(k)
+    m1 = 1.0
+    m2 = 2.0
+    m = DummySpringMaterial(k, m1, m2)
     spring = LinearSpring3D(m)
     X = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
     u = np.array([tr[0], tr[1], tr[2], tr[0]-1.0+direction[0], tr[1]+direction[1], tr[2]+direction[2]])
@@ -62,7 +68,9 @@ def test_linear_spring_should_return_hooke_force_in_direction_of_displacement():
     delta_l = 1.0
     l = l0 + delta_l
     k = 3.0
-    m = DummySpringMaterial(k)
+    m1 = 1.0
+    m2 = 2.0
+    m = DummySpringMaterial(k, m1, m2)
     spring = LinearSpring3D(m)
     X = np.array([0.0, 0.0, 0.0, l0, 0.0, 0.0])
 
@@ -90,7 +98,9 @@ def test_linear_spring_should_return_finite_difference_stiffness_matrix():
     delta_l = 2.0
     l = l0 + delta_l
     k = 3.0
-    m = DummySpringMaterial(k)
+    m1 = 1.0
+    m2 = 2.0
+    m = DummySpringMaterial(k, m1, m2)
     spring = LinearSpring3D(m)
     X = np.array([0.0, 0.0, 0.0, l0, 0.0, 0.0])
 
@@ -107,7 +117,9 @@ def test_linear_spring_should_return_finite_difference_stiffness_matrix():
 
 def test_linear_spring_should_return_hook_stiffness_matrix_for_linearization_around_initial_configuration():
     k = 3.0
-    m = DummySpringMaterial(k)
+    m1 = 1.0
+    m2 = 2.0
+    m = DummySpringMaterial(k, m1, m2)
     spring = LinearSpring3D(m)
     X = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
     u = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
@@ -126,7 +138,9 @@ def test_linear_spring_should_return_hook_stiffness_matrix_for_linearization_aro
 
 def test_linear_spring_should_return_hook_stiffness_matrix_for_linearization_around_90_degrees_rotated_configuration():
     k = 3.0
-    m = DummySpringMaterial(k)
+    m1 = 1.0
+    m2 = 2.0
+    m = DummySpringMaterial(k, m1, m2)
     spring = LinearSpring3D(m)
     X = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
     u = np.array([0.0, 0.0, 0.0, -1.0, 0.0, 1.0])
