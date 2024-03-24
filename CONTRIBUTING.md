@@ -1,11 +1,11 @@
-CONTRIBUTING
-============
+# CONTRIBUTING
+
 
 This document gives an overview over how you can contribute to the AMfe.
 
 
-Install DEV Environment
------------------------
+## Install DEV Environment
+
 
 Create a conda environment, install the build dependencies that are listed in pyproject.toml and run
 the following command:
@@ -13,9 +13,29 @@ the following command:
 python -m pip install --no-build-isolation --editable .
 ```
 
+### Workaround for pycharm:
 
-Issue Reporting
----------------
+Unfortunately, pycharm IDE does not recognize the new editable format used by pip.
+This is, why developers who work with this IDE need to perform a workaround until this has been fixed:
+
+First, install the build package and then run the build command in the root directory to
+build a python wheel.
+```
+python -m pip install build
+python -m build
+```
+Then, copy all `*.so` files from the wheel archive to `src/amfe` folder.
+Mark the `src` folder as *Sources Root* in pycharm IDE (via right-clicking in project tree).
+Futhermore, install the dependencies listed in pyproject.toml file manually into
+your python environment (conda env, virtualenv, ...).
+
+Now, you should have a working dev environment. However, whenever you change something
+in C-, Cython or Fortran modules, you need to recompile these and follow above described steps again.
+
+Note: If you want to run a script outside your IDE (e.g. to run pytest), you need to add the src folder to your PYTHONPATH.
+
+
+## Issue Reporting
 
 The easiest thing you can contribute is reporting issues.
 If you realize a bug you can report the issue on the issues section.
@@ -23,8 +43,7 @@ Please write an exact description of a bug.
 Include a minimal example or better a minimal unit test in the issue description
 which would fail due to the bug.
 
-Bug Fixing
-----------
+## Bug Fixing
 
 You are encouraged to fix the bug by yourself. Indicate your plan by assigning
 the issue to you. Try to fix the bug locally. When you are sure that you can fix
@@ -54,8 +73,7 @@ you accept the BSD license conditions
 Afterwards, you can ask a reviewer to review your code. The maintainer (currently Christian Meyer)
 decides over the final merge. 
 
-New Features
-------------
+## New Features
 
 In general, AMfe is a code that is often used for research. It also provides methods that are quite new or
 still in research. However, if you try out a new method you use, this is ok in your own private branches,
@@ -69,8 +87,7 @@ If you plan to add a new larger feature to AMfe, we will make a new feature bran
 branch as parent. There, many Merge Requests can be done until the feature is working.
 
 
-Review
-------
+## Review
 
 Each Merge Request into master MUST be reviewed.
 Reviewers should ask themselves the following questions when reviewing:
@@ -86,8 +103,7 @@ any tests that show the performance of the code
 - Are there docstrings for the new functions/features?
 
 
-Testing
--------
+## Testing
 
 To test your code, use pytest. You need to install the pytest python package first.
 Afterwards, you can run `pytest` inside the AMfe directory.

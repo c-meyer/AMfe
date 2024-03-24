@@ -49,6 +49,11 @@ class LinearSpring3D(Element):
                 )
 
     def _compute_tensors(self, X, u, t):
+        mass1 = self.material.mass1
+        mass2 = self.material.mass2
+        for i in range(3):
+            self.M[i, i] = mass1
+            self.M[i + 3, i + 3] = mass2
         # X_mat = X.reshape(-1, 3)
         # l = np.linalg.norm(X_mat[1,:]-X_mat[0,:])
 
@@ -111,9 +116,7 @@ class LinearSpring3D(Element):
             [Fz_u1, Fz_v1, Fz_w1, Fz_u2, Fz_v2, Fz_w2],
         ], dtype=np.float64)
 
-
         self.K = k_el
-        self.M = np.zeros((6, 6))
         self.f = f
         self.S = np.zeros((2, 6))
         self.E = np.zeros((2, 6))

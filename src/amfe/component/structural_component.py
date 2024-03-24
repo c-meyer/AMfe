@@ -8,7 +8,7 @@ import numpy as np
 import logging
 from .mesh_component import MeshComponent
 from amfe.assembly.structural_assembly import StructuralAssembly
-from amfe.component.constants import ELEPROTOTYPEHELPERLIST, SHELLELEPROTOTYPEHELPERLIST
+from amfe.component.constants import ELEPROTOTYPEHELPERLIST, SHELLELEPROTOTYPEHELPERLIST, SPRINGPROTOTYPEHELPERLIST
 from amfe.mesh import Mesh
 
 
@@ -18,8 +18,11 @@ class StructuralComponent(MeshComponent):
                               if element[1] is not None))
     SHELLELEMENTPROTOTYPES = dict(((element[0], element[1]()) for element in SHELLELEPROTOTYPEHELPERLIST
                               if element[1] is not None))
+    SPRINGELEMENTPROTOTYPES = dict(((element[0], element[1]()) for element in SPRINGPROTOTYPEHELPERLIST if element[1] is not None))
+
     BOUNDARYELEMENTFACTORY = dict(((element[0], element[2]) for element in ELEPROTOTYPEHELPERLIST
                                    if element[2] is not None))
+
     VALID_GET_MAT_NAMES = ('K', 'M', 'D')
 
     def __init__(self, mesh=Mesh()):

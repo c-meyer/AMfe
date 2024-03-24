@@ -8,7 +8,8 @@
 from amfe.element import *
 
 __all__ = ['ELEPROTOTYPEHELPERLIST',
-           'SHELLELEPROTOTYPEHELPERLIST']
+           'SHELLELEPROTOTYPEHELPERLIST',
+           'SPRINGPROTOTYPEHELPERLIST']
 
 
 ELEPROTOTYPEHELPERLIST = (('Tri3', Tri3, Tri3Boundary),
@@ -24,3 +25,5 @@ ELEPROTOTYPEHELPERLIST = (('Tri3', Tri3, Tri3Boundary),
                           ('quadratic_line', None, LineQuadraticBoundary))
 
 SHELLELEPROTOTYPEHELPERLIST = (('straight_line', LinearBeam3D, None),)
+
+SPRINGPROTOTYPEHELPERLIST = (('straight_line', LinearSpring3D, None),)
