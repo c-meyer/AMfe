@@ -182,7 +182,7 @@ class Hdf5MeshConverter(MeshConverter):
         # create mesh group
         group_mesh = hdf_fp.create_group("/mesh")
         group_mesh.attrs.create("TITLE", "Mesh")
-        group_mesh.create_dataset("MESH_VERSION", data=str(self._version))
+        group_mesh.attrs.create("MESH_VERSION", data=str(self._version))
 
         nodes_values = self._nodes_df[['x', 'y', 'z']].values
         nodes_ds = group_mesh.create_dataset("nodes", data=nodes_values, shape=nodes_values.shape)
@@ -235,6 +235,7 @@ class Hdf5MeshConverter(MeshConverter):
 
         row_arr = np.array(rows, dtype=dt)
         write_hdf5_table(hdf_fp, row_arr, "/mesh/elementids")
+
 
 def write_xdmf_mesh_from_hdf5(xdmffilename, hdffilename, meshroot):
     # get Infos from hdf5

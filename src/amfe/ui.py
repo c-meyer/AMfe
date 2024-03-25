@@ -30,6 +30,7 @@ from os.path import splitext
 from h5py import File
 from math import isclose
 import logging
+import pandas as pd
 
 
 __all__ = ['import_mesh_from_file',
@@ -358,7 +359,7 @@ def solve_linear_dynamic(system, formulation, component, t0, t_end, dt, write_ea
     return solution_writer
 
 
-def solve_nonlinear_static(system, formulation, component, load_steps):
+def solve_nonlinear_static(system, formulation, component, load_steps, atol=1e-8, rtol=2e-9):
     """
     Solves a MechanicalSystem using a nonlinear static method using newton for the nonlinear solver.
     The deformation is divided into an amount of intermediate steps which are defined in the number of load_steps.
@@ -387,8 +388,8 @@ def solve_nonlinear_static(system, formulation, component, load_steps):
     solfac.set_linear_solver('scipy-sparse')
     solfac.set_acceleration_intializer('zero')
     solfac.set_newton_maxiter(10)
-    solfac.set_newton_atol(1e-8)
-    solfac.set_newton_rtol(2e-9)
+    solfac.set_newton_atol(atol)
+    solfac.set_newton_rtol(rtol)
     solfac.set_dt_initial(1.0/load_steps)
 
     solver = solfac.create_solver()
@@ -519,7 +520,7 @@ def solve_modes(system, formulation, no_of_modes=10, x0=None, dx0=None, t0=0.0, 
 
 
 def write_results_to_paraview(solution, component, paraviewfilename, displacements_only=True,
-                              write_strains_and_stresses=True):
+                              write_strains_and_stresses=True, meshtags_to_write=None):
     """
     Writes results to an xdmf paraview file
 
@@ -536,7 +537,9 @@ def write_results_to_paraview(solution, component, paraviewfilename, displacemen
         functionality. This is default, because it is rarely needed to plot velocities and accelerations in dynamic
         cases as well.
     write_strains_and_stresses : bool
-        Flag if strains and stresses shall be exported to paraview
+        Flag if strains and stresses shall be exported to paraview.
+    meshtags_to_write : {list, None}
+        List with meshtags that shall be exported to paraview.
     """
     paraviewfilename = splitext(paraviewfilename)[0]
 
@@ -587,6 +590,16 @@ def write_results_to_paraview(solution, component, paraviewfilename, displacemen
                                        'data_type': PostProcessDataType.VECTOR,
                                        'hdf5path': '/results/stresses_shear'
                                        }
+
+    if meshtags_to_write is not None:
+        for meshtag in meshtags_to_write:
+            if pd.api.types.is_numeric_dtype(component.mesh.el_df[meshtag].dtype):
+                fielddict[meshtag] = {'mesh_entity_type': MeshEntityType.ELEMENT,
+                                      'data_type': PostProcessDataType.SCALAR,
+                                      'hdf5path': '/mesh/tags/{}'.format(meshtag)
+                                      }
+            else:
+                logging.warning('Meshtag {} is not a numeric dtype can not be exported to paraview'.format(meshtag))
 
     with open(xdmfresultsfilename, 'wb') as xdmffp:
         with File(hdf5resultsfilename, mode='r') as hdf5fp:
