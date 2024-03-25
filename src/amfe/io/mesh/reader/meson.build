@@ -5,7 +5,8 @@ python_sources = [
   'gid_json_mesh_reader.py',
   'gmsh_ascii_mesh_reader.py',
   'gmsh_ascii_v4_mesh_reader.py',
-  'hdf5_mesh_reader.py'
+  'hdf5_mesh_reader.py',
+  'salome_med_v4_mesh_reader.py'
 ]
 
 py3.install_sources(

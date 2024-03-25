@@ -55,3 +55,11 @@ io mesh reader hdf5_mesh_reader
     :undoc-members:
     :show-inheritance:
 
+
+io mesh reader salome_med_v4_mesh_reader
+-------------------------------
+
+.. automodule:: amfe.io.mesh.reader.salome_med_v4_mesh_reader
+    :members:
+    :undoc-members:
+    :show-inheritance:

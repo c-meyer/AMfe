@@ -20,7 +20,7 @@ from amfe.solver.translators import create_constrained_mechanical_system_from_co
 from amfe.solver import SolverFactory, AmfeSolution
 from amfe.structural_dynamics import vibration_modes
 
-from amfe.io.mesh import GidJsonMeshReader, AmfeMeshObjMeshReader, GmshAsciiMeshReader
+from amfe.io.mesh import GidJsonMeshReader, AmfeMeshObjMeshReader, GmshAsciiMeshReader, SalomeMedV4MeshReader
 from amfe.io.mesh import AmfeMeshConverter
 from amfe.io.postprocessing import *
 
@@ -50,7 +50,8 @@ __all__ = ['import_mesh_from_file',
            ]
 
 formats = {'.json': GidJsonMeshReader,
-           '.msh': GmshAsciiMeshReader}
+           '.msh': GmshAsciiMeshReader,
+           '.med': SalomeMedV4MeshReader}
 
 
 def import_mesh_from_file(filename):

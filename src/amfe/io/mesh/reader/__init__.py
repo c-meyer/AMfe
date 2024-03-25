@@ -19,3 +19,4 @@ from .gid_json_mesh_reader import *
 from .gmsh_ascii_mesh_reader import *
 from .hdf5_mesh_reader import *
 from .gmsh_ascii_v4_mesh_reader import *
+from .salome_med_v4_mesh_reader import SalomeMedV4MeshReader
