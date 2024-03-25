@@ -1056,7 +1056,7 @@ class Mesh:
         """
         if node_id is None:
             if self.no_of_nodes > 0:
-                node_id = self.nodes_df.last_valid_index() + 1
+                node_id = max(self.nodes_df.index) + 1
             else:
                 node_id = 0
 
@@ -1128,7 +1128,7 @@ class Mesh:
 
         if element_id is None:
             if self.no_of_elements > 0:
-                element_id = self._el_df.last_valid_index() + 1
+                element_id = max(self._el_df.index) + 1
             else:
                 element_id = 0
 
