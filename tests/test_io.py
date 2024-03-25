@@ -7,7 +7,7 @@ from unittest import TestCase
 from os.path import join, abspath, dirname
 from os import makedirs
 import os
-import numpy as np
+import pytest
 import pandas as pd
 import h5py
 from numpy.testing import assert_allclose, assert_array_equal
@@ -1491,6 +1491,14 @@ class PostProcessorTest(TestCase):
                            field_desired['index'])
         assert_array_equal(field_acceleration_actual['mesh_entity_type'],
                            field_desired['mesh_entity_type'])
+
+
+@pytest.mark.skip(reason="There is no documentation about the MED file specification. We need to guess how it works."
+                         "That is the reason why we do not have tests for the reader."
+                         "We do not know the deisred behavior.")
+def test_salome_v4_reader():
+    pass
+
 
 # Example for testing one certain test:
 if __name__ == '__main__':
