@@ -30,7 +30,7 @@ The following packages should be installed before you install amfe:
    - `numpy`, `mkl`, `meson`, `meson-python`
    - A fortran compiler (e.g. gfortran)
    - for building the documentation `sphinx`, `numpydoc`, `sphinx_rtd_theme`
-   - for testing `pytst`
+   - for testing `pytest`
    - for checking the code readability: `flake8`
 
 We recommend to create a separate environment in anaconda for your amfe installation.
@@ -117,29 +117,7 @@ As these topics are interesting for many people on the globe, lots of resources 
 
 #### IDEs:
 
-A good IDE to start with is Spyder, which has sort of a MATLAB-Style look and feel.
-It is part of anaconda and provides nice features like built-in debugging, static code analysis with pylint and a
-profiling tool to measure the performance of the code.
-
-Other editors integrate very well into Python like Atom.
-
-We work with PyCharm, which is an IDE for Python. However, as it provides many functions one could be
-overwhelmed by it at first. 
-
----------------------------------------
-**Hint** 
-
-On Mac OS X `Spyder 2` may run very slow, as there are some issues with the graphical frontent library, pyqt4. These issues are resolved on `Spyder 3` by using pyqt5, which can already be installed on anaconda as beta version resolving all these issues. To install `Spyder 3`, use either 
-
-    conda update qt pyqt
-    conda install -c qttesting qt pyqt
-    conda install -c spyder-ide spyder==3.0.0b6
-   
-or (which worked better for Johannes)
-   
-    pip install --pre -U spyder
-
--------------------------------------
+You are free to use any IDE that you like. We recommend PyCharm developed by jetbrains.
 
 #### Profiling the code
 
