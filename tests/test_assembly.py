@@ -48,7 +48,7 @@ class AssemblyToolsTest(TestCase):
         A_actual = csr_matrix(dummy)
         fill_csr_matrix(A_actual.indptr, A_actual.indices, A_actual.data, K, k_indices)
 
-        assert_array_equal(A_actual.A, A_desired.A)
+        assert_array_equal(A_actual.todense(), A_desired.todense())
 
     def test_base_class(self):
         class DummyObserver:
