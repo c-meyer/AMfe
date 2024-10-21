@@ -127,7 +127,10 @@ class ScipyConjugateGradientLinearSolver(LinearSolverBase):
         x : {array, matrix}
             solution vector
         """
-        x, _ = cg(A, b, x0, tol, maxiter, P, callback, atol)
+        # The interface has changed in scipy. Scipy does not allow atol=None anymore.
+        if atol is None:
+            atol = 0.0
+        x, _ = cg(A, b, x0, rtol=tol, maxiter=maxiter, M=P, callback=callback, atol=atol)
         return x
 
 
