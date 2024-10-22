@@ -266,6 +266,9 @@ class VtkMeshConverter(MeshConverter):
                     reordering = np.array([0, 1, 2, 3, 4, 5, 6, 9, 7, 8],
                                           dtype=int)
                     nodes = nodes[reordering]
+                elif etype == 'Prism6':
+                    reordering = np.array([1, 0, 2, 4, 3, 5])
+                    nodes = nodes[reordering]
                 for i, node in enumerate(nodes):
                     cell.GetPointIds().SetId(i, node)
                     self._eleid2cell.update({idx: cell})

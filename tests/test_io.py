@@ -454,6 +454,24 @@ class IOTest(TestCase):
         converter.build_no_of_elements(len(self.elements_input))
         converter.return_mesh()
 
+    def test_prism_to_vtk(self):
+        nodes = [
+            (10, 0.0, 0.0, 0.0),
+            (20, 1.0, 1.0, 0.0),
+            (30, 0.0, 1.0, 0.0),
+            (40, 0.0, 0.0, 1.0),
+            (50, 1.0, 1.0, 1.0),
+            (60, 0.0, 1.0, 1.0),
+        ]
+        filename = join('.results', 'prism.vtk')
+        elements = [(1, 'Prism6', [10, 20, 30, 40, 50, 60])]
+        converter = VtkMeshConverter(filename=filename)
+        for node in nodes:
+            converter.build_node(node[0], node[1], node[2], node[3])
+        for element in elements:
+            converter.build_element(element[0], element[1], element[2])
+        converter.return_mesh()
+
     def test_gmshascii_to_dummy(self):
         # Desired nodes
         nodes_desired = [(1, 0.0, 0.0, 0.0),
