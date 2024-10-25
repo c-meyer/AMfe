@@ -55,8 +55,8 @@ class AbaqusAsciiMeshReader(MeshReader):
         'Hexa20': 20,
     }
 
-    eletypes_3d = ['C3D10', 'C3D6', 'C3D8', 'C3D8I', 'C3D20']
-    eletypes_2d = ['CPS4R', 'CPS8R', 'C3D4', 'B31']
+    eletypes_3d = ['C3D4', 'C3D6', 'C3D8', 'C3D8I', 'C3D10', 'C3D20']
+    eletypes_2d = ['CPS4R', 'CPS8R', 'B31']
 
     def __init__(self, filename=None, ignore_errors=False):
         super().__init__()
