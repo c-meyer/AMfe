@@ -168,12 +168,15 @@ class StructuralComponent(MeshComponent):
             Damping matrix with applied constraints in sparse CSR format.
         """
         if self.rayleigh_damping:
-            self._D_constr = self.rayleigh_damping[0] * self.M(q, dq, t) + self.rayleigh_damping[1] * self.K(q, dq, t)
+            if self._D_constr is None:
+                q0 = np.zeros_like(q)
+                self._D_constr = self.rayleigh_damping[0] * self.M(q0, q0, t) + self.rayleigh_damping[1] * self.K(q0, q0, t)
+            return self._D_constr
         else:
-            self._D_constr = csc_matrix(
-                (self._constraints.no_of_dofs_unconstrained, self._constraints.no_of_dofs_unconstrained))
-
-        return self._D_constr
+            if self._D_constr is None:
+                self._D_constr = csc_matrix(
+                    (self._constraints.no_of_dofs_unconstrained, self._constraints.no_of_dofs_unconstrained))
+            return self._D_constr
 
     def f_int(self, q, dq, t):
         """
