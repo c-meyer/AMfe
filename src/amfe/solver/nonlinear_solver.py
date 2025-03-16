@@ -9,11 +9,11 @@
 Solver-module to solve nonlinear boundary value problems.
 """
 
-import logging
 import numpy as np
 from scipy.sparse import issparse
 from amfe.linalg.linearsolvers import ScipySparseLinearSolver
 
+from amfe.logging import log_warning, log_info
 from .tools import MemoizeJac
 
 from ..linalg.norms import vector_norm
@@ -129,10 +129,9 @@ class NewtonRaphson:
         # Check if tol is passed and write tol in atol if atol is not in options
         if tol is not None:
             if 'atol' in options:
-                logger = logging.getLogger(__name__)
-                logger.warning('Attention: atol option has been set in nonlinear solver options,'
+                log_warning(__name__, 'Attention: atol option has been set in nonlinear solver options,'
                                'but it is called with another tol. The tol has no effect.'
-                               'The atol in options dictionary will be used')
+                               'The atol in options dictionary will be used.')
             options.setdefault('atol', tol)
 
         # Parse options
@@ -149,16 +148,16 @@ class NewtonRaphson:
         res = residual(q, *args)
         res_abs = self._abs(res)
         if self._options['verbose']:
-            print('Iteration: {0:3d}, residual: {1:6.3E}'.format(iteration, res_abs))
+            log_info(__name__, 'Iteration: {0:3d}, residual: {1:6.3E}'.format(iteration, res_abs))
 
         while res_abs > self._options['atol']:
             iteration += 1
             if self._options['verbose']:
-                print('Iteration ', iteration, ' started...')
+                log_info(__name__, 'Iteration ', iteration, ' started...')
 
             # catch failing convergence
             if iteration > self._options['maxiter']:
-                print(abort_statement)
+                log_warning(__name__, abort_statement)
                 return q, (iteration, res_abs)
 
             # Update jacobian
@@ -190,8 +189,8 @@ class NewtonRaphson:
                         cond_nr = np.linalg.cond(Jac)
                 else:
                     cond_nr = Jac
-                print('Iteration: {0:3d}, residual: {1:6.3E}, condition: {2:6.3E}.'.format(iteration, res_abs, cond_nr))
+                log_info(__name__, 'Iteration: {0:3d}, residual: {1:6.3E}, condition: {2:6.3E}.'.format(iteration, res_abs, cond_nr))
             else:
                 if self._options['verbose']:
-                    print('Iteration: {0:3d}, residual: {1:6.3E}.'.format(iteration, res_abs))
+                    log_info(__name__, 'Iteration: {0:3d}, residual: {1:6.3E}.'.format(iteration, res_abs))
         return q, (iteration, res_abs)
