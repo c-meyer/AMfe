@@ -12,9 +12,9 @@ This module is under active development and in beta phase.
 Use it on your own risk.
 
 """
-import logging
 import numpy as np
 
+from amfe.logging import log_debug, log_warning, log_error
 from amfe.io.mesh.base import MeshReader
 
 __all__ = [
@@ -87,28 +87,26 @@ class AbaqusAsciiMeshReader(MeshReader):
         -------
         None
         """
-        logger = logging.getLogger(__name__)
-        logger.debug('Open file {}'.format(self._filename))
+        log_debug(__name__, 'Open file {}'.format(self._filename))
         with open(self._filename, 'r') as infile:
             for line in infile:
                 while line is not None and infile is not None:
                     line = self._dispatch(line, infile, builder)
 
 
-        logger.debug('End of file reached.')
+        log_debug(__name__, 'End of file reached.')
         # Build groups
         for name in self._groups:
-            logger.debug('Parse group {}'.format(name))
+            log_debug(__name__, 'Parse group {}'.format(name))
             builder.build_group(name, self._groups[name]['nodes'], self._groups[name]['elements'])
         # Build dimension
-        logger.debug('Parse dimension = {}'.format(self._dimension))
+        log_debug(__name__, 'Parse dimension = {}'.format(self._dimension))
         builder.build_mesh_dimension(self._dimension)
 
     def _dispatch(self, line, infile, builder):
-        logger = logging.getLogger(__name__)
-        logger.debug('Dispatch line {}'.format(line))
+        log_debug(__name__, 'Dispatch line {}'.format(line))
         if line.startswith('**'):
-            logger.debug('Found comment: {}'.format(line))
+            log_debug(__name__, 'Found comment: {}'.format(line))
             line = next(infile)
             return line
 
@@ -117,40 +115,38 @@ class AbaqusAsciiMeshReader(MeshReader):
         else:
             command = line.strip().lower()
         if command == '*node':
-            logger.debug('Found *Node section, dispatch to node handler')
+            log_debug(__name__, 'Found *Node section, dispatch to node handler')
             last_line = self._parse_nodes(infile, builder)
             return last_line
         if command == '*element':
-            logger.debug('Found *Element section, dispatch to element handler')
+            log_debug(__name__, 'Found *Element section, dispatch to element handler')
             last_line = self._parse_elements(line, infile, builder)
             return last_line
         if command == '*elset':
-            logger.debug('Found *Elset section, dispatch to set handler')
+            log_debug(__name__, 'Found *Elset section, dispatch to set handler')
             last_line = self._parse_set(line, infile, builder, 'elements')
             return last_line
         if command == '*nset':
-            logger.debug('Found *Nset section, dispatch to set handler')
+            log_debug(__name__, 'Found *Nset section, dispatch to set handler')
             last_line = self._parse_set(line, infile, builder, 'nodes')
             return last_line
         if command == '*surface':
-            logger.debug('Found *surface section, dispatch to surface handler')
+            log_debug(__name__, 'Found *surface section, dispatch to surface handler')
             last_line = self._parse_surface(line, infile, builder)
             return last_line
         else:
             err_msg = 'Unrecognized command: {}'.format(command)
-            logger.warning(err_msg)
+            log_warning(__name__, err_msg)
             last_line = self._parse_unrecognized(line, infile, builder)
             return last_line
 
     def _parse_unrecognized(self, line, infile, builder):
-        logger = logging.getLogger(__name__)
         for line in infile:
             if line.startswith('*'):
-                logger.debug('End of unrecognized section reached')
+                log_debug(__name__, 'End of unrecognized section reached')
                 return line
 
     def _parse_surface(self, line, infile, builder):
-        logger = logging.getLogger(__name__)
         is_elementset = False
         is_nodeset = False
         surface_name = None
@@ -169,16 +165,16 @@ class AbaqusAsciiMeshReader(MeshReader):
                     elif value.lower() == 'element':
                         is_elementset = True
                     else:
-                        logging.warning("Could not parse surface {}".format(line))
+                        log_warning(__name__, "Could not parse surface {}".format(line))
                 else:
-                    logging.warning("Could not parse surface {}".format(line))
+                    log_warning(__name__, "Could not parse surface {}".format(line))
 
             except IndexError:
-                logging.warning("Could not get value for key-value pair {}".format(key_value))
+                log_warning(__name__, "Could not get value for key-value pair {}".format(key_value))
 
         for line in infile:
             if line.startswith('*'):
-                logger.debug('End of surface section reached')
+                log_debug(__name__, 'End of surface section reached')
                 # Build surface:
                 if surface_name is not None:
                     groupname = "_SURFACE_" + surface_name
@@ -188,18 +184,17 @@ class AbaqusAsciiMeshReader(MeshReader):
                         elif is_elementset:
                             self._groups.update({groupname: {'nodes': [], 'elements': entityset}})
                     else:
-                        logging.error("SURFACE {} with groupname {} already exists.".format(surface_name, groupname))
+                        log_error(__name__, "SURFACE {} with groupname {} already exists.".format(surface_name, groupname))
                 else:
-                    logging.error("SURFACE could not be parsed due to missing surface name.")
+                    log_error(__name__, "SURFACE could not be parsed due to missing surface name.")
                 return line
             else:
                 entityset.append(int(line.split(',')[0].strip()))
 
     def _parse_nodes(self, infile, builder):
-        logger = logging.getLogger(__name__)
         for line in infile:
             if line.startswith('*'):
-                logger.debug('End of Node section reached')
+                log_debug(__name__, 'End of Node section reached')
                 return line
             try:
                 separated_node_data = line.split(',')
@@ -216,7 +211,6 @@ class AbaqusAsciiMeshReader(MeshReader):
 
     def _parse_elements(self, line, infile, builder):
         tet10reordering = np.array([0, 1, 2, 3, 4, 5, 6, 8, 9, 7], dtype=int)
-        logger = logging.getLogger(__name__)
         separated_command = [e.strip() for e in line.split(',')]
         elementtype = None
         is_elset = False
@@ -234,15 +228,15 @@ class AbaqusAsciiMeshReader(MeshReader):
                     is_elset = True
                     elset_name = value
             except IndexError:
-                logging.warning("Could not get value for key-value pair {}".format(key_value))
+                log_warning(__name__, "Could not get value for key-value pair {}".format(key_value))
 
         if elementtype == None or elementtype not in self.eletypes:
             err_string = 'Elementtype {} could not be parsed because it is not supported by AMfe'.format(elementtype)
             if self._ignore_errors:
-                logging.warning(err_string)
+                log_warning(__name__, err_string)
                 for line in infile:
                     if line.startswith('*'):
-                        logger.debug('End of Element section reached')
+                        log_debug(__name__, 'End of Element section reached')
                         return line
             else:
                 raise ValueError(err_string)
@@ -252,7 +246,7 @@ class AbaqusAsciiMeshReader(MeshReader):
                 self._dimension = 3
             for line in infile:
                 if line.startswith('*'):
-                    logger.debug('End of Element section reached')
+                    log_debug(__name__, 'End of Element section reached')
                     # Always build a group with elementtype:
                     groupname = self._get_next_elset_num(elementtype)
                     if groupname not in self._groups:
@@ -291,7 +285,6 @@ class AbaqusAsciiMeshReader(MeshReader):
 
 
     def _parse_set(self, firstline, infile, builder, entitytype):
-        logger = logging.getLogger(__name__)
         if entitytype != 'elements' and entitytype != 'nodes':
             raise ValueError('Entitytype {} is not valid'.format(entitytype))
         separated_command = [e.strip() for e in firstline.split(',')]
@@ -305,9 +298,9 @@ class AbaqusAsciiMeshReader(MeshReader):
                 if key.lower() == 'instance' or key.lower() == 'nset' or key.lower() == 'elset':
                     groupname = groupname_prefix + value
                 else:
-                    logging.warning("Could not parse set {}".format(firstline))
+                    log_warning(__name__, "Could not parse set {}".format(firstline))
             except IndexError:
-                logging.warning("Could not get value for key-value pair {}".format(key_value))
+                log_warning(__name__, "Could not get value for key-value pair {}".format(key_value))
         if 'generate' in separated_command:
             generate = True
         else:
@@ -318,7 +311,7 @@ class AbaqusAsciiMeshReader(MeshReader):
         all_ids = []
         for line in infile:
             if line.startswith('*'):
-                logger.debug('End of {} set section reached'.format(entitytype))
+                log_debug(__name__, 'End of {} set section reached'.format(entitytype))
                 if len(self._groups[groupname][entitytype]) > 0:
                     all_ids.extend(self._groups[groupname][entitytype])
                     all_ids = list(set(all_ids))

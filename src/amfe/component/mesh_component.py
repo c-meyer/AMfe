@@ -4,7 +4,7 @@
 #
 # Distributed under 3-Clause BSD license. See LICENSE file for more information.
 #
-
+from amfe.logging import log_debug
 from amfe.mesh import Mesh
 from amfe.mapping import StandardMapping
 from .component_base import ComponentBase
@@ -147,15 +147,14 @@ class MeshComponent(ComponentBase):
         self._update_elements_on_nodes()
 
     def _update_elements_on_nodes(self):
-        logger = logging.getLogger(__name__)
-        logger.debug('Update number of elements on nodes...')
+        log_debug(__name__, 'Update number of elements on nodes...')
         self._elements_on_nodes = np.zeros(self._mesh.no_of_nodes)
         # get volume elements:
         element_ids = self._ele_obj_df['fk_mesh'].values
         iconn = np.array([self._mesh.get_iconnectivity_by_elementids(element_ids)]).reshape(-1)
         for ic in iconn:
             self._elements_on_nodes[ic] += 1
-        logger.debug('Update number of elements on nodes finished.')
+        log_debug(__name__, 'Update number of elements on nodes finished.')
 
     # -- ASSIGN NEUMANN CONDITION METHODS -----------------------------------------------------------------
     def assign_neumann(self, name, condition, tag_values, tag='_groups', ignore_nonexistent=False):

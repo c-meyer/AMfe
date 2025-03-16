@@ -16,11 +16,10 @@ in Optimization
 
 """
 
-import logging
-
 import numpy as np
 import pandas as pd
 
+from amfe.logging import log_debug
 from .constraint_assembler import ConstraintAssembler
 from .constraint import *
 
@@ -250,8 +249,7 @@ class ConstraintManager:
             ATTENTION: Whether this is needed or not depends on the constraint's type. Take a look at the constraint-
             classes' documentation!
         """
-        logger = logging.getLogger(__name__)
-        logger.debug('Adding constraint {} to dofs {} and nodes {}'.format(name, dofidxs, Xidxs))
+        log_debug(__name__, 'Adding constraint {} to dofs {} and nodes {}'.format(name, dofidxs, Xidxs))
 
         # Create new rows for constraints_df
         df = pd.DataFrame(

@@ -27,11 +27,11 @@
 # SOFTWARE.
 #
 
-import logging
 import h5py
 import numpy as np
 
 from amfe.io.mesh.base import MeshReader
+from amfe.logging import log_warning
 
 
 class SalomeMedV4MeshReader(MeshReader):
@@ -100,8 +100,6 @@ class SalomeMedV4MeshReader(MeshReader):
         -------
 
         """
-        logger = logging.getLogger(__name__)
-
         with h5py.File(self._filename, 'r') as infile:
             # Get the submesh
             meshes = infile["ENS_MAA"]
@@ -145,7 +143,7 @@ class SalomeMedV4MeshReader(MeshReader):
             for medshape in elements.keys():
                 shape = self.eletypes[medshape]
                 if shape is None:
-                    logger.warning('Shape {} cannot be converted'.format(shape))
+                    log_warning(__name__, 'Shape {} cannot be converted. This shape is ignored.'.format(shape))
                     continue
                 no_of_elements += elements[medshape]["NOD"].attrs["NBR"]
 
@@ -180,8 +178,8 @@ class SalomeMedV4MeshReader(MeshReader):
 
             builder.build_tag('salome_family', element_tags, dtype=int)
 
-            groups_set_elements = self._build_groups_dict(element_groups, element_tags, logger)
-            groups_to_nodeids = self._build_groups_dict(node_groups, nodetag2nodeid, logger)
+            groups_set_elements = self._build_groups_dict(element_groups, element_tags)
+            groups_to_nodeids = self._build_groups_dict(node_groups, nodetag2nodeid)
 
             for groupname, groupelements in groups_set_elements.items():
                 builder.build_group(groupname, [], np.unique(groupelements))
@@ -190,7 +188,7 @@ class SalomeMedV4MeshReader(MeshReader):
                 builder.build_group(groupname, np.array(groupelements), [])
 
     @staticmethod
-    def _build_groups_dict(element_groups, element_tags, logger):
+    def _build_groups_dict(element_groups, element_tags):
         groups_set = {}
         for family, groups in element_groups.items():
             for group in groups:
@@ -200,7 +198,7 @@ class SalomeMedV4MeshReader(MeshReader):
                     else:
                         groups_set.update({group: list(element_tags[family].copy())})
                 except KeyError:
-                    logger.warning('There seem no elements assigned to '
+                    log_warning(__name__, 'There seem no elements assigned to '
                                    'MED-File Family {}. Check if group {} '
                                    'is imported accordingly.'.format(
                         family, group))

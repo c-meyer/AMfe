@@ -5,7 +5,7 @@
 
 from scipy.sparse import csc_matrix
 import numpy as np
-import logging
+
 from .mesh_component import MeshComponent
 from amfe.assembly.structural_assembly import StructuralAssembly
 from amfe.component.constants import ELEPROTOTYPEHELPERLIST, SHELLELEPROTOTYPEHELPERLIST, SPRINGPROTOTYPEHELPERLIST
@@ -308,9 +308,6 @@ class StructuralComponent(MeshComponent):
         stresses : ndarray
             nodal stresses for each node
         """
-        logger = logging.getLogger(__name__)
-        logger.info('assembling strains and stresses...')
-
         K_csr, f_glob, self._stresses, self._strains = self._assembly.assemble_k_f_S_E(self._mesh.nodes, self.ele_obj,
                                                       self._mesh.get_iconnectivity_by_elementids(
                                                           self._ele_obj_df['fk_mesh'].values),
