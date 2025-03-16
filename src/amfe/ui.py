@@ -19,6 +19,7 @@ from amfe.neumann.structural_neumann import FixedDirectionNeumann, NormalFollowi
 from amfe.solver.translators import create_constrained_mechanical_system_from_component
 from amfe.solver import SolverFactory, AmfeSolution
 from amfe.structural_dynamics import vibration_modes
+from amfe.logging import log_info, log_debug, log_warning
 
 from amfe.io.mesh import GidJsonMeshReader, AmfeMeshObjMeshReader, GmshAsciiMeshReader, SalomeMedV4MeshReader
 from amfe.io.mesh import AmfeMeshConverter
@@ -29,7 +30,6 @@ import os
 from os.path import splitext
 from h5py import File
 from math import isclose
-import logging
 import pandas as pd
 
 
@@ -96,8 +96,7 @@ def create_mechanical_system(structural_component, constant_mass=False,
 
 def create_material(material_type='Kirchhoff', **kwargs):
     if len(kwargs) == 0:
-        logger = logging.getLogger(__name__)
-        logger.debug('No material-parameters were given. I am setting them to default.')
+        log_debug(__name__, 'No material-parameters were given. I am setting them to default.')
     if material_type == 'Kirchhoff':
         if 'E' in kwargs:
             E = kwargs['E']
@@ -292,11 +291,10 @@ def solve_linear_static(system, formulation, component):
     q = solver.solve(system.K(q0, dq0, 0), system.f_ext(q0, dq0, 0))
     u, du, ddu = formulation.recover(q, dq0, ddq0, 0)
     solution_writer.write_timestep(0, u, None, None)
-    logger = logging.getLogger(__name__)
-    logger.info('Strains and stresses are currently not supported for linear models. Only nonlinear kinematics are '
+    log_info(__name__, 'Strains and stresses are currently not supported for linear models. Only nonlinear kinematics are '
                 'currently used during their calculation.')
 
-    print('Solution finished')
+    log_info(__name__, 'Solution completed.')
     return solution_writer
 
 
@@ -351,11 +349,10 @@ def solve_linear_dynamic(system, formulation, component, t0, t_end, dt, write_ea
 
     solver.solve(write_callback, t0, q0, dq0, t_end)
 
-    logger = logging.getLogger(__name__)
-    logger.info('Strains and stresses are currently not supported for linear models. Only nonlinear kinematics are '
+    log_info(__name__, 'Strains and stresses are currently not supported for linear models. Only nonlinear kinematics are '
                 'currently used during their calculation.')
 
-    print('Solution finished')
+    log_info(__name__, 'Solution completed.')
     return solution_writer
 
 
@@ -599,7 +596,7 @@ def write_results_to_paraview(solution, component, paraviewfilename, displacemen
                                       'hdf5path': '/mesh/tags/{}'.format(meshtag)
                                       }
             else:
-                logging.warning('Meshtag {} is not a numeric dtype can not be exported to paraview'.format(meshtag))
+                log_warning(__name__, 'Meshtag {} is not a numeric dtype can not be exported to paraview'.format(meshtag))
 
     with open(xdmfresultsfilename, 'wb') as xdmffp:
         with File(hdf5resultsfilename, mode='r') as hdf5fp:
