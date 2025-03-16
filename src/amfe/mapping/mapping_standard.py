@@ -3,12 +3,12 @@
 # Distributed under BSD-3-Clause License. See LICENSE-File for more information
 #
 
-import logging
-
 import numpy as np
 import pandas as pd
 
 from .mapping_base import MappingBase
+from amfe.logging import log_debug
+
 
 __all__ = ['StandardMapping']
 
@@ -19,8 +19,6 @@ class StandardMapping(MappingBase):
 
     Attributes
     ----------
-    logger : logging.Logger
-        Logger instance for logging
     _nodal2global : pandas.DataFrame
         DataFrame containing Mapping Information of the nodal dofs
         index: nodeid
@@ -40,7 +38,7 @@ class StandardMapping(MappingBase):
         Parameters
         ----------
         fields : list of strings
-            Describing the physical fields thath shall be mapped (e.g. ['ux', 'uy', 'uz', 'T']
+            Describing the physical fields that shall be mapped (e.g. ['ux', 'uy', 'uz', 'T']
         nodeids : numpy.array
             Array containing the nodeids of the nodes that shall be mapped
         connectivity : numpy.array
@@ -60,7 +58,6 @@ class StandardMapping(MappingBase):
         -------
         None
         """
-        logger = logging.getLogger(__name__)
         # make empty pandas Dataframe for nodes2global
         data = -1*np.ones(len(nodeids), dtype=np.int64)
         self._nodal2global = pd.DataFrame({key: data for key in fields}, index=nodeids)
@@ -76,7 +73,7 @@ class StandardMapping(MappingBase):
                                                                                                     callbacks,
                                                                                                     callbackargs)):
 
-            logger.debug('Added element {:10d} of {:10d}'.format(index, no_of_elements))
+            log_debug(__name__, 'Added element {:10d} of {:10d}'.format(index, no_of_elements))
             # iterate over dofs of element
             global_dofs_for_element = []
             for localdofnumber, dofinfo in enumerate(element_dofinfos):

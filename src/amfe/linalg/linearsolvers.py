@@ -12,7 +12,8 @@ from scipy.sparse import csr_matrix, issparse
 from scipy.sparse.linalg import spsolve, cg
 from copy import deepcopy
 import numpy as np
-import logging
+
+from amfe.logging import log_debug, log_warning
 
 
 __all__ = [
@@ -198,9 +199,7 @@ try:
             return dict([(self.IPARM_DICT[key], iparms[key]) for key in iparms])
 
 except Exception as e:
-
-    logger = logging.getLogger(__name__)
-    logger.warning('PardisoLinearSolver could not be loaded. Possibly mkllib is not installed properly')
+    log_warning(__name__, 'PardisoLinearSolver could not be loaded. Possibly mkllib is not installed properly')
 
     class PardisoLinearSolver:
         def __init__(self, *args, **kwargs):
@@ -246,8 +245,6 @@ class ResidualbasedConjugateGradient:
         x : {array, matrix}
             solution vector
         """
-
-        logger = logging.getLogger(__name__)
         sol = x0
         d = residual_callback(np.zeros(sol.shape))
         res = residual_callback(sol)
@@ -261,7 +258,7 @@ class ResidualbasedConjugateGradient:
         converged = False
         if conv_crit <= tol:
             converged = True
-            logger.debug("CG converged due to initial residual=0")
+            log_debug(__name__, "CG converged due to initial residual=0")
         while not converged:
             q = -residual_callback(w) + d
                             
@@ -275,11 +272,11 @@ class ResidualbasedConjugateGradient:
             conv_crit = np.linalg.norm(res)
             if conv_crit <= tol:
                 converged = True
-                logger.debug("CG converged at iteration {};  Residual: {}".format(cg_iter, conv_crit))
+                log_debug(__name__, "CG converged at iteration {};  Residual: {}".format(cg_iter, conv_crit))
                 break
             
             if cg_iter >= maxiter or conv_crit > 1e6:
-                logger.debug("WARNING: CG not converged at iteration {};  Residual: {}".format(cg_iter, conv_crit))
+                log_warning(__name__, "CG not converged at iteration {};  Residual: {}".format(cg_iter, conv_crit))
                 break
             
             beta = np.dot(res.T, res) / np.dot(res_old.T, res_old)
@@ -287,7 +284,7 @@ class ResidualbasedConjugateGradient:
             w = res + beta * w
 
             cg_iter += 1
-            logger.debug("CG iteration {};  Residual: {}".format(cg_iter, conv_crit))
+            log_debug(__name__, "CG iteration {};  Residual: {}".format(cg_iter, conv_crit))
             
         residual_callback(sol)
             

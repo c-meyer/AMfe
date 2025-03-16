@@ -2,14 +2,12 @@
 TODO: Write introduction to ECSW
 """
 
-import logging
-
 import numpy as np
 from scipy.linalg import solve as linsolve
 from scipy.sparse import csc_matrix
 
+from amfe.logging import log_debug, log_info
 from .ecsw_assembly import EcswAssembly
-
 
 __all__ = ['sparse_nnls',
            'ecsw_assemble_G_and_b',
@@ -103,8 +101,7 @@ def sparse_nnls(G, b, tau, conv_stats=True):
             active_set[const_idx] = False
 
         r = b - G[:, active_set] @ xi[active_set]
-        logger = logging.getLogger('amfe.hyper_red.ecsw.snnls')
-        logger.debug("snnls: residual {} No of active elements: {}".format(np.linalg.norm(r), len(np.where(xi)[0])))
+        log_debug(__name__, "snnls: residual {} No of active elements: {}".format(np.linalg.norm(r), len(np.where(xi)[0])))
         if conv_stats:
             stats.append((len(np.where(xi)[0]), np.linalg.norm(r)))
 
@@ -155,9 +152,6 @@ def ecsw_assemble_G_and_b(component, S, W, timesteps=None):
     # Check the raw dimension
     # Currently not applicable
     # assert(component.no_of_dofs == S.shape[0])
-
-    logger = logging.getLogger('amfe.hyper_red.ecsw.ecsw_assemble_G_and_b')
-
     if timesteps is None:
         timesteps = np.zeros(S.shape[1], dtype=np.float64)
 
@@ -165,7 +159,7 @@ def ecsw_assemble_G_and_b(component, S, W, timesteps=None):
     no_of_reduced_dofs = W.shape[1]
 
     no_of_elements = component.no_of_elements
-    logger.info('Start building large selection matrix G. In total {0:d} elements are treated:'.format(
+    log_info(__name__, 'Start building large selection matrix G. In total {0:d} elements are treated:'.format(
                   no_of_elements))
 
     G = np.zeros((no_of_reduced_dofs*no_of_snapshots, no_of_elements))
@@ -186,7 +180,7 @@ def ecsw_assemble_G_and_b(component, S, W, timesteps=None):
         # Change nonzero weighted elements to current element
         g_assembly.indices = [element_no]
 
-        logger.debug('Assemble element {:10d} / {:10d}'.format(element_no+1, no_of_elements))
+        log_debug(__name__, 'Assemble element {:10d} / {:10d}'.format(element_no+1, no_of_elements))
         # loop over all snapshots
 
         for snapshot_number, (snapshot_vector, t) in enumerate(zip(S.T, timesteps)):
