@@ -4,11 +4,12 @@ py3 = py_mod.find_installation(pure: false)
 python_sources = [
   '__init__.py',
   'forces.py',
+  'logging.py',
   'material.py',
   'mesh.py',
   'structural_dynamics.py',
   'tools.py',
-  'ui.py'
+  'ui.py',
 ]
 
 py3.install_sources(
