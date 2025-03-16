@@ -4,15 +4,14 @@ Test for amfe-tools module
 
 from unittest import TestCase
 import numpy as np
-from scipy.sparse import csr_matrix
 import pandas as pd
 from amfe.tools import invert_dictionary, invert_dictionary_with_iterables
-from .tools import CustomDictAssertTest
+from .tools import CustomDictAsserter
 
 
 class ToolsTest(TestCase):
     def setUp(self):
-        self.custom_asserter = CustomDictAssertTest()
+        self.custom_asserter = CustomDictAsserter(self)
 
     def tearDown(self):
         pass

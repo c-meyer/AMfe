@@ -2,7 +2,7 @@ from unittest import TestCase
 import numpy as np
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
-__all__ = ['CustomDictAssertTest']
+__all__ = ['CustomDictAsserter']
 
 
 def jacobian_finite_difference(func, outdim, x0):
@@ -22,19 +22,21 @@ def jacobian_finite_difference(func, outdim, x0):
     return jac
 
 
-class CustomDictAssertTest(TestCase):
+class CustomDictAsserter:
     """
     Customized methods to test dictionaries by iterating through their items.
 
     Attributes
     ----------
+    _testcase: unittest.TestCase
+        Testcase to run assertions.
     _recursion_counter : int
         Counter for recursive method-calls
     max_recursions : int
         Limit-number of recursion-calls
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, testcase):
+        self._testcase = testcase
         self._recursion_counter = 0
         self.max_recursions = 10
 
@@ -63,7 +65,7 @@ class CustomDictAssertTest(TestCase):
                     if isinstance(value, np.ndarray):
                         assert_array_almost_equal(value, dict2[key])
                     else:
-                        self.assertAlmostEqual(value, dict2[key])
+                        self._testcase.assertAlmostEqual(value, dict2[key])
             self._recursion_counter = 0
         else:
             raise RuntimeError('Recursion stopped to avoid infinite loops')
@@ -92,7 +94,7 @@ class CustomDictAssertTest(TestCase):
                     if isinstance(value, np.ndarray):
                         assert_array_equal(value, dict2[key])
                     else:
-                        self.assertEqual(value, dict2[key])
+                        self._testcase.assertEqual(value, dict2[key])
             self._recursion_counter = 0
         else:
             raise RuntimeError('Recursion stopped to avoid infinite loops')

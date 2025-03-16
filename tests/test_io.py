@@ -38,7 +38,7 @@ from amfe.io.postprocessing.reader import AmfeHdf5PostProcessorReader, \
 from amfe.io.postprocessing.writer import Hdf5PostProcessorWriter
 from amfe.io.postprocessing.base import PostProcessorWriter
 
-from tests.tools import CustomDictAssertTest
+from tests.tools import CustomDictAsserter
 from tests.io_tools import create_amfe_obj, clean_test_outputs
 
 
@@ -109,7 +109,7 @@ class IOTest(TestCase):
         directory = join(dirname(abspath(__file__)), '.results')
         if os.path.exists(directory):
             clean_test_outputs(directory)
-        self.custom_asserter = CustomDictAssertTest()
+        self.custom_asserter = CustomDictAsserter(self)
 
     def tearDown(self):
         pass

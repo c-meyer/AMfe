@@ -12,7 +12,7 @@ from collections.abc import Iterable
 from amfe.io.tools import amfe_dir
 from amfe.io.mesh import AmfeMeshConverter, GmshAsciiMeshReader
 from copy import copy
-from .tools import CustomDictAssertTest
+from .tools import CustomDictAsserter
 import pprint
 
 
@@ -49,7 +49,7 @@ class DummyMaterial2:
 
 class TestPartitioner(TestCase):
     def setUp(self):
-        self.custom_asserter = CustomDictAssertTest()
+        self.custom_asserter = CustomDictAsserter(self)
         self.testmesh = Mesh(dimension=2)
         '''
         Testmesh:                Partition:

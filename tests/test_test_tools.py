@@ -4,13 +4,13 @@ Test for tools module of test-tools
 
 from unittest import TestCase, expectedFailure
 import numpy as np
-from .tools import CustomDictAssertTest
+from .tools import CustomDictAsserter
 from copy import copy
 
 
 class CustomAssertMethodsTest(TestCase):
     def setUp(self):
-        self.custom_asserter = CustomDictAssertTest()
+        self.custom_asserter = CustomDictAsserter(self)
 
     def tearDown(self):
         pass
