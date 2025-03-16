@@ -14,8 +14,8 @@ import numpy as np
 import pandas as pd
 import vtk
 from os.path import splitext
-import logging
 
+from amfe.logging import log_warning
 from amfe.io.mesh.base import MeshConverter
 
 __all__ = [
@@ -297,8 +297,7 @@ class VtkMeshConverter(MeshConverter):
                 elif tag_dict['dtype'] == float:
                     vtkarray = vtk.vtkFloatArray()
                 else:
-                    logger = logging.getLogger(__name__)
-                    logger.warning('Tag that is not float or int cannot be written to vtkfile')
+                    log_warning(__name__, 'Tag that is not float or int cannot be written to vtkfile')
                     continue
                 vtkarray.SetNumberOfComponents(1)
                 vtkarray.SetNumberOfTuples(self._vtkelements.GetNumberOfCells())
@@ -347,8 +346,7 @@ class VtkMeshConverter(MeshConverter):
         elif file_extension == '.vtk':
             vtkwriter = vtk.vtkUnstructuredGridWriter()
         else:
-            logger = logging.getLogger(__name__)
-            logger.warning('No file extension was given, \'vtk\' format is chosen')
+            log_warning(__name__, 'No file extension was given, \'vtk\' format is chosen')
             self._filename = self._filename + '.vtk'
             vtkwriter = vtk.vtkUnstructuredGridWriter()
 

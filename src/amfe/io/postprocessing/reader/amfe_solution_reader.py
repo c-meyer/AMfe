@@ -6,8 +6,8 @@
 #
 
 import numpy as np
-import logging
 
+from amfe.logging import log_debug
 from ..base import PostProcessorReader
 from amfe.io import MeshEntityType, PostProcessDataType
 
@@ -40,27 +40,25 @@ class AmfeSolutionReader(PostProcessorReader):
         -------
 
         """
-        logger = logging.getLogger(__name__)
-
         t = np.array(self._amfesolution.t)
         index = self._meshcomponent.mesh.nodes_df.index.values
 
         if self._amfesolution.q[0] is not None:
-            logger.info('Read displacement field from AmfeSolution')
+            log_debug(__name__, 'Read displacement field from AmfeSolution')
             u_unconstrained = np.array(self._amfesolution.q).T
             displacement_field = self._convert_data_2_field(u_unconstrained)
             builder.write_field('displacement', PostProcessDataType.VECTOR, t, displacement_field, index,
                                 MeshEntityType.NODE)
 
         if self._amfesolution.dq[0] is not None:
-            logger.info('Read velocity field from AmfeSolution')
+            log_debug(__name__, 'Read velocity field from AmfeSolution')
             du_unconstrained = np.array(self._amfesolution.dq).T
             velocity_field = self._convert_data_2_field(du_unconstrained)
             builder.write_field('velocity', PostProcessDataType.VECTOR, t, velocity_field, index,
                                 MeshEntityType.NODE)
 
         if self._amfesolution.ddq[0] is not None:
-            logger.info('Read acceleration field from AmfeSolution')
+            log_debug(__name__, 'Read acceleration field from AmfeSolution')
             ddu_unconstrained = np.array(self._amfesolution.ddq).T
             acceleration_field = self._convert_data_2_field(ddu_unconstrained)
             builder.write_field('acceleration', PostProcessDataType.VECTOR, t, acceleration_field, index,
