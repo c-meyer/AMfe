@@ -133,6 +133,8 @@ class SalomeMedV4MeshReader(MeshReader):
 
             if "FAM" in nodes:
                 node_tags = nodes["FAM"][:]
+                unique_tags = np.unique(node_tags)
+                nodetag2nodeid = {tag: nodeids[np.argwhere(node_tags == tag).flatten()] for tag in unique_tags}
 
             fas = mesh["FAS"] if "FAS" in mesh else infile["FAS"][mesh_name]
             if "NOEUD" in fas:
@@ -178,22 +180,31 @@ class SalomeMedV4MeshReader(MeshReader):
 
             builder.build_tag('salome_family', element_tags, dtype=int)
 
-            groups_set = {}
-            for family, groups in element_groups.items():
-                for group in groups:
-                    try:
-                        if group in groups_set:
-                            groups_set[group].extend(element_tags[family])
-                        else:
-                            groups_set.update({group: element_tags[family].copy()})
-                    except KeyError:
-                        logger.warning('There seem no elements assigned to '
-                                       'MED-File Family {}. Check if group {} '
-                                       'is imported accordingly.'.format(
-                            family, group))
+            groups_set_elements = self._build_groups_dict(element_groups, element_tags, logger)
+            groups_to_nodeids = self._build_groups_dict(node_groups, nodetag2nodeid, logger)
 
-            for groupname, groupelements in groups_set.items():
+            for groupname, groupelements in groups_set_elements.items():
                 builder.build_group(groupname, [], np.unique(groupelements))
+
+            for groupname, groupelements in groups_to_nodeids.items():
+                builder.build_group(groupname, np.array(groupelements), [])
+
+    @staticmethod
+    def _build_groups_dict(element_groups, element_tags, logger):
+        groups_set = {}
+        for family, groups in element_groups.items():
+            for group in groups:
+                try:
+                    if group in groups_set:
+                        groups_set[group].extend(list(element_tags[family]))
+                    else:
+                        groups_set.update({group: list(element_tags[family].copy())})
+                except KeyError:
+                    logger.warning('There seem no elements assigned to '
+                                   'MED-File Family {}. Check if group {} '
+                                   'is imported accordingly.'.format(
+                        family, group))
+        return groups_set
 
     def _read_families(self, fas_data):
         families = {}
