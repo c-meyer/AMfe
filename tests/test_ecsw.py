@@ -344,7 +344,7 @@ class EcswTest(TestCase):
 
         ele_obj = np.array([self.ele, self.ele], dtype=object)
         element2dofs = [np.array([0, 1, 2, 3, 4, 5], dtype=np.intp), np.array([0, 1, 4, 5, 6, 7], dtype=np.intp)]
-        elements_on_node = np.array([weights[0], np.Inf, weights[0], weights[0]])
+        elements_on_node = np.array([weights[0], np.inf, weights[0], weights[0]])
 
         K_global = asm.preallocate(8, element2dofs)
         f_global = np.zeros(K_global.shape[0])

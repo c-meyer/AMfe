@@ -178,19 +178,19 @@ class LinearOneMassOscillatorTest(TestCase):
         self.k = 0.5
 
         def M(q, dq, t):
-            return np.array([self.m])
+            return np.array([self.m], ndmin=2, dtype=float)
 
         def K(q, dq, t):
-            return np.array([self.k])
+            return np.array([self.k], ndmin=2, dtype=float)
 
         def f_int(q, dq, t):
-            return np.array([self.k]).dot(q)
+            return np.array([self.k], ndmin=2, dtype=float).dot(q)
 
         def f_ext(q, dq, t):
-            return np.array([0])
+            return np.array([0.0], ndmin=2, dtype=float)
 
         def D(q, dq, t):
-            return np.array([0])
+            return np.array([0.0], ndmin=2, dtype=float)
 
         self.integrator = GeneralizedAlpha(M, f_int, f_ext, K, D)
         self.integrator.dt = 0.001
