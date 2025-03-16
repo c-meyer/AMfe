@@ -20,7 +20,7 @@ jobs:
         echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        sudo apt-get install -y gfortran build-essential libgl1-mesa-glx
+        sudo apt-get install -y gfortran build-essential libgl1 libglx-mesa0 
         gfortran --version
         which gfortran
     - name: Install AMfe
