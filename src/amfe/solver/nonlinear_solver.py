@@ -153,7 +153,7 @@ class NewtonRaphson:
         while res_abs > self._options['atol']:
             iteration += 1
             if self._options['verbose']:
-                log_info(__name__, 'Iteration ', iteration, ' started...')
+                log_info(__name__, f'Iteration {iteration} started...')
 
             # catch failing convergence
             if iteration > self._options['maxiter']:
