@@ -97,6 +97,10 @@ class AmfeMeshConverter(MeshConverter):
         return
 
     def build_group(self, name, nodeids=None, elementids=None):
+        if nodeids is None:
+            nodeids = []
+        if elementids is None:
+            elementids = []
         # append group information
         group = {name: {'nodes': nodeids, 'elements': elementids}}
         self._groups.update(group)

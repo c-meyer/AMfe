@@ -13,6 +13,7 @@ Use it on your own risk.
 
 """
 import numpy as np
+import pandas as pd
 
 from amfe.logging import log_debug, log_warning, log_error
 from amfe.io.mesh.base import MeshReader
@@ -58,6 +59,30 @@ class AbaqusAsciiMeshReader(MeshReader):
     eletypes_3d = ['C3D4', 'C3D6', 'C3D8', 'C3D8I', 'C3D10', 'C3D20']
     eletypes_2d = ['CPS4R', 'CPS8R', 'B31']
 
+    surface2localelementnodes = {
+        'Hexa8': {
+            'S1': ('Quad4', np.array([0, 1, 2, 3], dtype=int)),
+            'S2': ('Quad4', np.array([4, 7, 6, 5], dtype=int)),
+            'S3': ('Quad4', np.array([0, 4, 5, 1], dtype=int)),
+            'S4': ('Quad4', np.array([1, 5, 6, 2], dtype=int)),
+            'S5': ('Quad4', np.array([2, 6, 7, 3], dtype=int)),
+            'S6': ('Quad4', np.array([3, 7, 4, 0], dtype=int)),
+        },
+        'Tet4': {
+            'S1': ('Tri3', np.array([0, 1, 2], dtype=int)),
+            'S2': ('Tri3', np.array([0, 3, 1], dtype=int)),
+            'S3': ('Tri3', np.array([1, 3, 2], dtype=int)),
+            'S4': ('Tri3', np.array([2, 3, 0], dtype=int))
+        },
+        'Prism6': {
+            'S1': ('Tri3', np.array([0, 1, 2], dtype=int)),
+            'S2': ('Tri3', np.array([3, 4, 5], dtype=int)),
+            'S3': ('Quad4', np.array([0, 1, 4, 3], dtype=int)),
+            'S4': ('Quad4', np.array([1, 2, 5, 4], dtype=int)),
+            'S5': ('Quad4', np.array([2, 0, 3, 5], dtype=int)),
+        },
+    }
+
     def __init__(self, filename=None, ignore_errors=False):
         super().__init__()
         self._filename = filename
@@ -65,6 +90,12 @@ class AbaqusAsciiMeshReader(MeshReader):
         self._groups = dict()
         self._max_num_for_eltype = dict()
         self._ignore_errors = ignore_errors
+
+        self._element_ids = []
+        self._element_shapes = []
+        self._element_connectivity = []
+
+        self._post_elements = {}  # These elements do not have an ID in input file, but need to be created at the end.
         return
 
     def _get_next_elset_num(self, eltype):
@@ -95,6 +126,27 @@ class AbaqusAsciiMeshReader(MeshReader):
 
 
         log_debug(__name__, 'End of file reached.')
+        # Build elements
+        element_df = pd.DataFrame({'shape': self._element_shapes, 'connectivity': self._element_connectivity},
+                                  index=self._element_ids)
+        del self._element_ids
+        del self._element_shapes
+        del self._element_connectivity
+
+        for row in element_df.itertuples():
+            builder.build_element(row.Index, row.shape, row.connectivity)
+        # Build surfaces
+        max_elementid = np.max(element_df.index)
+        for groupname, entityset in self._post_elements.items():
+            group_elementids = []
+            for referenced_eleid, surface_str in entityset:
+                source_eleshape = element_df.loc[referenced_eleid, 'shape']
+                target_eleshape, local_nodeidxs = self.surface2localelementnodes[source_eleshape][surface_str]
+                nodeids = np.array(element_df.loc[referenced_eleid, 'connectivity'], dtype=int)[local_nodeidxs]
+                max_elementid = max_elementid + 1
+                builder.build_element(max_elementid, target_eleshape, nodeids)
+                group_elementids.append(max_elementid)
+            builder.build_group(groupname, [], group_elementids)
         # Build groups
         for name in self._groups:
             log_debug(__name__, 'Parse group {}'.format(name))
@@ -182,14 +234,18 @@ class AbaqusAsciiMeshReader(MeshReader):
                         if is_nodeset:
                             self._groups.update({groupname: {'nodes': entityset, 'elements': []}})
                         elif is_elementset:
-                            self._groups.update({groupname: {'nodes': [], 'elements': entityset}})
+                            # Now we need to build elements
+                            self._post_elements.update({groupname: entityset})
                     else:
                         log_error(__name__, "SURFACE {} with groupname {} already exists.".format(surface_name, groupname))
                 else:
                     log_error(__name__, "SURFACE could not be parsed due to missing surface name.")
                 return line
             else:
-                entityset.append(int(line.split(',')[0].strip()))
+                if is_elementset:
+                    entityset.append((int(line.split(',')[0].strip()), str(line.split(',')[1].strip())))
+                else:
+                    entityset.append(int(line.split(',')[0].strip()))
 
     def _parse_nodes(self, infile, builder):
         for line in infile:
@@ -279,7 +335,10 @@ class AbaqusAsciiMeshReader(MeshReader):
                             # TODO: We can only parse elements with 2 nodes at the moment. The orientation node is dropped.
                             nodeids = nodeids[:2]
                         elementids.append(elementid)
-                        builder.build_element(elementid, amfeshape, nodeids)
+
+                        self._element_ids.append(elementid)
+                        self._element_shapes.append(amfeshape)
+                        self._element_connectivity.append(nodeids)
                     except ValueError:
                         raise ValueError('Could not parse line as element: {}'.format(line))
 
