@@ -50,6 +50,7 @@ from amfe.linalg.norms import vector_norm
 __all__ = ['NonholonomicConstraintBase',
            'HolonomicConstraintBase',
            'DirichletConstraint',
+           'MultipointConstraint',
            'FixedDistanceConstraint',
            'FixedDistanceToLineConstraint',
            'NodesCollinear2DConstraint',
@@ -59,12 +60,40 @@ __all__ = ['NonholonomicConstraintBase',
            ]
 
 
+def _zero(t):
+    return 0.0
+
+
 class NonholonomicConstraintBase:
-
-    NO_OF_CONSTRAINTS = 0
-
-    def __init__(self):
+    def __init__(self, no_of_constraints):
+        self._is_linear_scleronomic = False
+        self._no_of_constraints = no_of_constraints
         return
+
+    @property
+    def is_linear_scleronomic(self):
+        """
+        Returns True if the constraint is linear and scleronomic.
+
+        Linear means that the function g(u, t) can be expressed by:
+
+        .. math::
+          g(u, t) = A \cdot u = 0
+
+        where A does not depend on u or t.
+        If all constraints are linear scleronomic in a system, AMfe can handle the constraint in a more performant
+        manner.
+
+        Returns
+        -------
+        value: bool
+            True if the constraint is linear and scleronomic.
+        """
+        return self._is_linear_scleronomic
+
+    @property
+    def no_of_constraints(self):
+        return self._no_of_constraints
 
     def after_assignment(self, dofids):
         """
@@ -157,11 +186,8 @@ class NonholonomicConstraintBase:
 
 
 class HolonomicConstraintBase(NonholonomicConstraintBase):
-
-    NO_OF_CONSTRAINTS = 0
-
-    def __init__(self):
-        super().__init__()
+    def __init__(self, no_of_constraints):
+        super().__init__(no_of_constraints)
         return
 
     def B(self, X, u, t):
@@ -268,10 +294,7 @@ class DirichletConstraint(HolonomicConstraintBase):
     _ddU: function
         contains the function of enforced accelerations (time derivative of _dU)
     """
-
-    NO_OF_CONSTRAINTS = 1
-
-    def __init__(self, U=(lambda t: 0.), dU=(lambda t: 0.), ddU=(lambda t: 0.)):
+    def __init__(self, U=_zero, dU=_zero, ddU=_zero):
         """
         A Dirichlet Constraint can be initialized with predefined displacements
 
@@ -287,10 +310,14 @@ class DirichletConstraint(HolonomicConstraintBase):
             function with signature float ddU: f(float: t)
             describing enforced accelerations
         """
-        super().__init__()
+        super().__init__(no_of_constraints=1)
         self._U = U
         self._dU = dU
         self._ddU = ddU
+        if U == _zero and dU == _zero and ddU == _zero:
+            self._is_linear_scleronomic = True
+        else:
+            self._is_linear_scleronomic = False
         return
 
     def after_assignment(self, dofids):
@@ -384,7 +411,7 @@ class DirichletConstraint(HolonomicConstraintBase):
         u: numpy.array
             current displacements for the dofs that shall be constrained
         du: numpy.array
-            current velocities for the dofs that schall be constrained
+            current velocities for the dofs that shall be constrained
         t: float
             time
 
@@ -397,14 +424,149 @@ class DirichletConstraint(HolonomicConstraintBase):
         return np.array([-self._ddU(t)], ndmin=1)
 
 
+class MultipointConstraint(HolonomicConstraintBase):
+    """
+    Class to define a multipoint constraint.
+
+    This constraint is a linear scleronomic constraint which is defined by the equation
+
+    .. math::
+        g(u, t) = w_1 u_1 + w_2 u_2 + ... + w_n u_n = 0.0
+
+    where w_i are called weights.
+
+    Attributes
+    ----------
+    _weights: numpy.ndarray
+        Array containing the weights w_i for constraint equation: w_1*u_1 + w_2*u_2 + ... + w_n*u_n = 0.0.
+    _is_linear_scleronomic: bool
+        True since the constraint is considered linear scleronomic.
+    """
+
+    def __init__(self, weights):
+        """
+        A multipoint constraint.
+
+        Parameters
+        ----------
+        weights: numpy.array
+            Array containing the weights w_i for constraint equation: w_1*q_1 + w_2*q_2 + ... + w_n*q_n = 0.0.
+        """
+        super().__init__(no_of_constraints=1)
+        self._weights = np.array(weights, dtype=float)
+        self._is_linear_scleronomic = True
+        return
+
+    def after_assignment(self, dofids):
+        """
+        In this case the number of constraints is set after assignment because this is unknown before
+
+        Parameters
+        ----------
+        dofids: list or numpy.array
+            list or numpy.array containing the dof-IDs of the dofs that are constrained by this Dirichlet Constraint
+
+        Returns
+        -------
+        None
+        """
+        return
+
+    def g(self, X_local, u_local, t):
+        """
+        Constraint-function for a fixed dirichlet constraint.
+
+        Parameters
+        ----------
+        X_local: numpy.array
+            Empty numpy array because Dirichlet Constraints to not need node coordinates
+        u_local: numpy.array
+            current displacements for the dofs that shall be constrained
+        t: float
+            time
+
+        Returns
+        -------
+        g: ndarray
+            Residual of the holonomic constraint function
+        """
+        return self._weights.dot(u_local)
+
+    def B(self, X_local, u_local, t):
+        """
+        Jacobian of constraint-function w.r.t. displacements u
+
+        Parameters
+        ----------
+        X_local: numpy.array
+            Empty numpy array because dirichlet constraints do not need information about node coordinates
+        u_local: numpy.array
+            current displacements for the dofs that shall be constrained
+        t: float
+            time
+
+        Returns
+        -------
+        B: ndarray
+            Partial derivative of constraint function g w.r.t. displacements u
+        """
+        return self._weights
+
+    def b(self, X, u, t):
+        """
+        Partial Derivative of holonomic constraint function g w.r.t. time t
+
+        Parameters
+        ----------
+        X: ndarray
+            local node coordinates of dofs in reference domain
+        u: ndarray
+            local displacements
+        t: float
+            time
+
+        Returns
+        -------
+        b: ndarray
+            Partial derivative of the constraint function g w.r.t. time t
+        """
+        return np.array([0.0], dtype=np.float64, ndmin=1)
+
+    def a(self, X, u, du, t):
+        r"""
+        It computes the inhomogeneous part on acceleration level
+
+        .. math::
+            \frac{\partial B(u, t)}{\partial u} \cdot \dot{u}^2 + \
+            \frac{\partial B(u, t)}{\partial t} \cdot \dot{u} + \frac{\partial b(u, t)}{\partial u} \dot{u} + \
+            \frac{\partial b(u, t)}{\partial t} \\
+
+        Parameters
+        ----------
+        X: numpy.array
+            Empty numpy array because dirichlet constraints do not need information about node coordinates
+        u: numpy.array
+            current displacements for the dofs that shall be constrained
+        du: numpy.array
+            current velocities for the dofs that shall be constrained
+        t: float
+            time
+
+        Returns
+        -------
+        a: numpy.array
+            The above described entity (inhomogeneous part of acceleration level constraint)
+
+        """
+        return np.array([0.0], dtype=np.float64, ndmin=1)
+
+
 class FixedDistanceConstraint(HolonomicConstraintBase):
     """
     Class to define a fixed distance between two nodes.
     """
-    NO_OF_CONSTRAINTS = 1
-
     def __init__(self):
-        super().__init__()
+        super().__init__(no_of_constraints=1)
         return
 
     def g(self, X_local, u_local, t):
@@ -549,13 +711,10 @@ class FixedDistanceConstraint(HolonomicConstraintBase):
 
 
 class FixedDistanceToLineConstraint(HolonomicConstraintBase):
-
-    NO_OF_CONSTRAINTS = 1
-
     def __init__(self):
         """
         """
-        super().__init__()
+        super().__init__(no_of_constraints=1)
         return
 
     def g(self, X_local, u_local, t):
@@ -905,13 +1064,11 @@ class NodesCollinear2DConstraint(HolonomicConstraintBase):
     Caution: Only three points are allowed to be passed to the functions
     Otherwise the results will be wrong."""
 
-    NO_OF_CONSTRAINTS = 1
-
     def __init__(self):
         """
         Constructor
         """
-        super().__init__()
+        super().__init__(no_of_constraints=1)
         return
 
     def g(self, X_local, u_local, t):
@@ -1042,10 +1199,8 @@ class EqualDisplacementConstraint(HolonomicConstraintBase):
     """
     Class to define a fixed distance between two nodes.
     """
-    NO_OF_CONSTRAINTS = 1
-
     def __init__(self):
-        super().__init__()
+        super().__init__(no_of_constraints=1)
         return
 
     def g(self, X_local, u_local, t):
@@ -1148,10 +1303,8 @@ class FixedDistanceToPlaneConstraint(HolonomicConstraintBase):
     The ordering is [x1 y1 z1 x2 y2 z2 x3 y3 z3 x4 y4 z4]
     The same ordering is used for the X-coords in reference domain.
     """
-    NO_OF_CONSTRAINTS = 1
-
     def __init__(self):
-        super().__init__()
+        super().__init__(no_of_constraints=1)
 
         x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4 = symbols('x1, x2 ,x3,'
                                                                  'x4, y1, y2,'
@@ -1287,10 +1440,8 @@ class NodesCoplanarConstraint(HolonomicConstraintBase):
     """
     Class to define a nodes coplanar constraint between four nodes.
     """
-    NO_OF_CONSTRAINTS = 1
-
     def __init__(self):
-        super().__init__()
+        super().__init__(no_of_constraints=1)
         return
 
     def g(self, X_local, u_local, t):
@@ -1406,7 +1557,7 @@ class NodesCoplanarConstraint(HolonomicConstraintBase):
         u: numpy.array
             current displacements for the dofs that shall be constrained
         du: numpy.array
-            current velocities for the dofs that schall be constrained
+            current velocities for the dofs that shall be constrained
         t: float
             time
 

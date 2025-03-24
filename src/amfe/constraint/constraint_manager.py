@@ -327,7 +327,7 @@ class ConstraintManager:
         no_of_constraints_by_object: list
             list of ints that containt the number of dofs 'removed' by the constrained
         """
-        return [const['constraint_obj'].NO_OF_CONSTRAINTS for i, const in self._constraints_df.iterrows()]
+        return [const['constraint_obj'].no_of_constraints for i, const in self._constraints_df.iterrows()]
 
     def _dofidxs(self):
         """

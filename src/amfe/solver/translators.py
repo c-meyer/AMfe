@@ -23,7 +23,7 @@ from amfe.solver.tools import MemoizeStiffness, MemoizeConstant, MakeConstantCal
 from amfe.constraint.constraint_formulation_boolean_elimination import BooleanEliminationConstraintFormulation
 from amfe.constraint.constraint_formulation_lagrange_multiplier import SparseLagrangeMultiplierConstraintFormulation
 from amfe.constraint.constraint_formulation_nullspace_elimination import NullspaceConstraintFormulation
-
+from amfe.constraint.constraint_formulation_follower_elimination import FollowerEliminationConstraintFormulation
 
 __all__ = [
     'MechanicalSystem',
@@ -371,6 +371,17 @@ def _create_constraint_formulation(component, formulation, **formulation_options
     if formulation == 'boolean':
 
         constraint_formulation = BooleanEliminationConstraintFormulation(no_of_dofs_unconstrained,
+                                                                         component.M,
+                                                                         component.f_int,
+                                                                         component.B,
+                                                                         component.f_ext,
+                                                                         component.K,
+                                                                         component.D,
+                                                                         g_func=
+                                                                         component.g_holo)
+    elif formulation == 'elimination':
+
+        constraint_formulation = FollowerEliminationConstraintFormulation(no_of_dofs_unconstrained,
                                                                          component.M,
                                                                          component.f_int,
                                                                          component.B,
