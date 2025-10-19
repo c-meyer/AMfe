@@ -7,14 +7,15 @@
 
 import numpy as np
 from scipy.sparse import csr_matrix, issparse, coo_matrix
+from scipy.sparse.linalg import spsolve
 
 from .constraint_formulation import ConstraintFormulationBase
-from ..logging import log_error, log_debug
+from ..logging import log_debug, log_warning
 
 
 class FollowerEliminationConstraintFormulation(ConstraintFormulationBase):
     """
-    Works only with holonomic scleronomic constraints that result in a constant Boolean B matrix
+    Works only with holonomic scleronomic constraints that result in a constant B matrix
     (Jacobian of the constraint function)
 
     Attributes
@@ -119,12 +120,23 @@ class FollowerEliminationConstraintFormulation(ConstraintFormulationBase):
         nrows, ncols = B.shape
         for row in range(nrows):
             found = False
-            b_row = B[row, :].toarray().flatten()
+            b_row = B[row, :]
+            if issparse(B):
+                b_row = b_row.toarray().flatten()
             sorted_dofs = np.argsort(np.abs(b_row))[::-1]
             for dof in sorted_dofs:
+                # debugging message:
+                if b_row[dof] != 1.0 and b_row[dof] != -1.0:
+                    log_debug(__name__, 'Found dof for elimination might not be the best one.')
                 if dof not in constrained_dofs:
                     constrained_dofs.append(dof)
                     found = True
+                    if b_row[dof] == 0.0:
+                        raise NotImplementedError('This constraint cannot be handled with AMfe yet because the'
+                                                  'identified dof for elimination is a zero in the B matrix.')
+                    ratio = np.max(np.abs(b_row)) / b_row[dof]
+                    if np.max(np.abs(b_row))/b_row[dof] > 1.e4:
+                        log_warning(__name__, 'The ratio {} for this constraint is large. The constraint might lead to a ill-conditioned system.'.format(ratio))
                     break
             if not found:
                 raise ValueError("Could not find any dof that can be eliminated in B")
@@ -165,11 +177,17 @@ class FollowerEliminationConstraintFormulation(ConstraintFormulationBase):
         vals_master = np.ones(len(master_dofs))
         mat_master = coo_matrix((vals_master, (rows_master, cols_master)), shape=(ndof_unconstrained, len(master_dofs)))
 
-        b_follower_inv = -1./np.array([B[i, constrained_dof] for i, constrained_dof in enumerate(constrained_dofs)])
-        b_transformed = (B[:, master_dofs].T.multiply(b_follower_inv)).T
-        mat_follower_temp = b_transformed.tocoo()
-        row_follower = np.array([constrained_dofs[r] for r in mat_follower_temp.row], dtype=int)
-        mat_follower = coo_matrix((mat_follower_temp.data, (row_follower, mat_follower_temp.col)), shape=(ndof_unconstrained, len(master_dofs)))
+        B_s = B[:, constrained_dofs]
+        B_m = B[:, master_dofs]
+        L_s = spsolve(B_s, -B_m)
+        if issparse(L_s):
+            L_s = L_s.tocoo()
+        else:
+            L_s = coo_matrix(L_s)
+        rows_follower = np.array([constrained_dofs[r] for r in L_s.row])
+        cols_follower = L_s.col
+        data_follower = L_s.data
+        mat_follower = coo_matrix((data_follower, (rows_follower, cols_follower)), shape=(ndof_unconstrained, len(master_dofs)))
         L = mat_master + mat_follower
 
         if format == 'csr':
