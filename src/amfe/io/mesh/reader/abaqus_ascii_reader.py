@@ -81,6 +81,21 @@ class AbaqusAsciiMeshReader(MeshReader):
             'S4': ('Quad4', np.array([1, 2, 5, 4], dtype=int)),
             'S5': ('Quad4', np.array([2, 0, 3, 5], dtype=int)),
         },
+        'Tet10': {
+            # the reordering is applied here: tet10reordering = np.array([0, 1, 2, 3, 4, 5, 6, 8, 9, 7], dtype=int)
+            'S1': ('Tri6', np.array([0, 1, 2, 4, 5, 6], dtype=int)),
+            'S2': ('Tri6', np.array([0, 3, 1, 9, 7, 4], dtype=int)),
+            'S3': ('Tri6', np.array([1, 3, 2, 7, 8, 5], dtype=int)),
+            'S4': ('Tri6', np.array([2, 3, 0, 8, 9, 6], dtype=int))
+        },
+        'Hexa20': {
+            'S1': ('Quad8', np.array([0, 1, 2, 3, 8, 9, 10, 11], dtype=int)),
+            'S2': ('Quad8', np.array([4, 7, 6, 5, 15, 14, 13, 11], dtype=int)),
+            'S3': ('Quad8', np.array([0, 4, 5, 1, 16, 12, 17, 8], dtype=int)),
+            'S4': ('Quad8', np.array([1, 5, 6, 2, 17, 13, 18, 9], dtype=int)),
+            'S5': ('Quad8', np.array([2, 6, 7, 3, 18, 14, 19, 10], dtype=int)),
+            'S6': ('Quad8', np.array([3, 7, 4, 0, 19, 15, 16, 11], dtype=int)),
+        }
     }
 
     def __init__(self, filename=None, ignore_errors=False):
