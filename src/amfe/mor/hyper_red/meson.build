@@ -2,6 +2,7 @@ python_sources = [
   '__init__.py',
   'ecsw.py',
   'ecsw_assembly.py',
+  'ecsw_g_assembly.py',
   'poly3.py',
   'training_set_generation.py'
 ]
