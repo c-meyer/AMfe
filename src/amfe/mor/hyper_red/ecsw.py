@@ -14,6 +14,8 @@ __all__ = ['sparse_nnls',
            'ecsw_get_weights_by_component',
            'EcswAssembly']
 
+from amfe.mor.hyper_red.ecsw_g_assembly import EcswGAssembly
+
 
 def sparse_nnls(G, b, tau, conv_stats=True):
     r"""
@@ -160,37 +162,31 @@ def ecsw_assemble_G_and_b(component, S, W, timesteps=None):
 
     no_of_elements = component.no_of_elements
     log_info(__name__, 'Start building large selection matrix G. In total {0:d} elements are treated:'.format(
-                  no_of_elements))
+        no_of_elements))
 
-    G = np.zeros((no_of_reduced_dofs*no_of_snapshots, no_of_elements))
+    G = np.zeros((no_of_reduced_dofs * no_of_snapshots, no_of_elements))
 
     # Temporarily replace Assembly of component:
     old_assembly = component.assembly
-    g_assembly = EcswAssembly([], [])
+    g_assembly = EcswGAssembly()
     component.assembly = g_assembly
-
-    # Weight only one element by one
-    g_assembly.weights = [1.0]
 
     # Set dq and ddq = 0
     dq = np.zeros(no_of_dofs)
+    C_csr_old = component._C_csr
 
     # loop over all elements
-    for element_no in range(no_of_elements):
-        # Change nonzero weighted elements to current element
-        g_assembly.indices = [element_no]
+    for snapshot_number, (snapshot_vector, t) in enumerate(zip(S.T, timesteps)):
+        G[snapshot_number * no_of_reduced_dofs:(snapshot_number + 1) * no_of_reduced_dofs, :] = W.T @ component.K(
+            snapshot_vector,
+            dq, t)
 
-        log_debug(__name__, 'Assemble element {:10d} / {:10d}'.format(element_no+1, no_of_elements))
-        # loop over all snapshots
-
-        for snapshot_number, (snapshot_vector, t) in enumerate(zip(S.T, timesteps)):
-            G[snapshot_number*no_of_reduced_dofs:(snapshot_number+1)*no_of_reduced_dofs, element_no] = W.T @ component.f_int(snapshot_vector,
-                                                                                                       dq, t)
 
     b = np.sum(G, axis=1)
 
     # reset assembly
     component.assembly = old_assembly
+    component._C_csr = C_csr_old
     return G, b
 
 
