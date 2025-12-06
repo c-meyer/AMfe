@@ -1,5 +1,6 @@
 python_sources = [
   '__init__.py',
+  'abaqus_ascii_reader.py',
   'amfe_mesh_obj_mesh_reader.py',
   'gid_ascii_mesh_reader.py',
   'gid_json_mesh_reader.py',
