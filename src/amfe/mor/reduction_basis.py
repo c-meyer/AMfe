@@ -12,6 +12,7 @@ import numpy as np
 import scipy as sp
 from scipy.sparse.linalg import LinearOperator, eigsh, splu
 
+from amfe.logging import log_info, log_warning, log_debug
 from amfe.linalg.linearsolvers import ScipySparseLinearSolver
 from amfe.linalg.orth import m_orthogonalize
 from amfe.linalg.tools import arnoldi
@@ -326,7 +327,8 @@ def nelson_method(A_func, X0, lambda0, p_directions, p0=None, M=None, dA_dp=None
     return Theta
 
 
-def jacobian_finite_difference(A_func, direction, x0=None, h=1.0, method='central'):
+def jacobian_finite_difference(a_func, direction, x0=None, h=1.0,
+                               method='central'):
     r"""
     Computes the jacobian of matrix A(x) in a certain direction
 
@@ -337,7 +339,7 @@ def jacobian_finite_difference(A_func, direction, x0=None, h=1.0, method='centra
 
     Parameters
     ----------
-    A_func: callable
+    a_func: callable
         Function that returns A for a given x
     direction: array_like
         direction of the derivative
@@ -358,11 +360,11 @@ def jacobian_finite_difference(A_func, direction, x0=None, h=1.0, method='centra
         x0 = np.zeros_like(direction)
     # finite difference scheme
     if method == 'central':
-        jac = (A_func(x0 + h * direction) - A_func(x0 - h * direction)) / (2 * h)
+        jac = (a_func(x0 + h * direction) - a_func(x0 - h * direction)) / (2*h)
     elif method == 'upwind' or method == 'forward':
-        jac = (A_func(x0 + h * direction) - A_func(x0)) / h
+        jac = (a_func(x0 + h * direction) - a_func(x0)) / h
     elif method == 'backward':
-        jac = (A_func(x0) - A_func(-h * direction)) / h
+        jac = (a_func(x0) - a_func(-h * direction)) / h
     else:
         raise ValueError('Finite difference scheme is not valid.')
     return jac
@@ -436,7 +438,7 @@ def modal_derivatives(V, omega, K_func, M, x0=None, h=1.0, verbose=True,
     return Theta
 
 
-def static_derivatives(V, K_func, M=None, shift=None, x0=None, h=1.0,
+def static_derivatives(v, k_func, m=None, shift=None, x0=None, h=1.0,
                        verbose=True, symmetric=True,
                        finite_diff='central', out=None):
     """
@@ -446,17 +448,17 @@ def static_derivatives(V, K_func, M=None, shift=None, x0=None, h=1.0,
 
     Parameters
     ----------
-    V : ndarray
+    v : array_like
         array containing the linear basis
-    K_func : function
+    k_func : function
         function returning the tangential stiffness matrix for a given
         displacement. Has to work like `K = K_func(u)`.
-    M : ndarray, optional
+    m : array_like, optional
         mass matrix. Can be sparse or dense. If `None` is given, the mass of 0
         is assumed. Default value is `None`.
     shift : float, optional
         shift frequency in rad/s. Default value is 0.
-    x0 : ndarray
+    x0 : array_like
         u vector around which the static derivatives shall be computed
     h : float, optional
         step width for finite difference scheme. Default value is 500 * machine
@@ -471,13 +473,13 @@ def static_derivatives(V, K_func, M=None, shift=None, x0=None, h=1.0,
         difference based on a central difference scheme, 'forward' based on an
         forward scheme etc. Note that the upwind scheme can cause severe
         distortions of the static correction derivative.
-    out : ndarray, optional
-        ndarray where static derivatives shall be written to
+    out : array_like, optional
+        array_like where static derivatives shall be written to
 
     Returns
     -------
-    Theta : ndarray
-        three dimensional array of static modal derivatives. Theta[:,i,j]
+    theta : array_like
+        Three dimensional array of static modal derivatives. Theta[:,i,j]
         contains the static derivative 1/2 * dx_i / dx_j. As the static
         derivatives are symmetric, Theta[:,i,j] == Theta[:,j,i].
 
@@ -486,46 +488,53 @@ def static_derivatives(V, K_func, M=None, shift=None, x0=None, h=1.0,
     modal_derivative
     """
 
-    no_of_dofs, no_of_modes = V.shape
+    no_of_dofs, no_of_modes = v.shape
 
     if x0 is None:
         x0 = np.zeros(no_of_dofs)
 
     if out is None:
-        Theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=np.float64)
+        theta = np.zeros((no_of_dofs, no_of_modes, no_of_modes), dtype=float)
     else:
-        Theta = out
+        theta = out
 
     if shift is not None:
-        if (shift > 0.0) and (M is not None):
-            K_dyn0 = K_func(x0) - shift**2 * M
+        if (shift > 0.0) and (m is not None):
+            k_dyn0 = k_func(x0) - shift ** 2 * m
         else:
             raise ValueError('shift must be positive and M must be given')
     else:
-        K_dyn0 = K_func(x0)
+        k_dyn0 = k_func(x0)
 
-    print('Factorizing K...', end='')
-    solve_k_dyn = splu(K_dyn0)
-    print('finished')
-
-    for j, v_j in enumerate(V.T):
-        if verbose:
-            print('Computing finite difference K-matrix')
-        dK_dv_j = jacobian_finite_difference(K_func, v_j, x0, h, finite_diff)
-        b = - dK_dv_j @ V
-        if verbose:
-            print('Solving linear system #', j)
-        Theta[:, :, j] = solve_k_dyn.solve(b)
-        if verbose:
-            print('Done solving linear system #', j)
     if verbose:
-        residual = np.linalg.norm(Theta - Theta.transpose(0, 2, 1)) / \
-                   np.linalg.norm(Theta)
-        print('The residual, i.e. the unsymmetric values, are', residual)
+        log_info(__name__, 'Factorizing K...')
+    solve_k_dyn = splu(k_dyn0)
+    if verbose:
+        log_info(__name__, 'Factorizing K completed.')
+
+    for j, v_j in enumerate(v.T):
+        if verbose:
+            log_info(__name__, 'Computing finite difference K-matrix')
+        dk_dv_j = jacobian_finite_difference(k_func, v_j, x0, h, finite_diff)
+        if np.any(np.isnan(dk_dv_j.data)):
+            log_warning(__name__, 'Caution dK_dv_j contains nans, try with greater h:')
+            dk_dv_j = jacobian_finite_difference(k_func, v_j, x0, h*10, finite_diff)
+            if np.any(np.isnan(dk_dv_j.data)):
+                raise ArithmeticError('Finite Difference Scheme failed')
+        b = - dk_dv_j @ v
+        if verbose:
+            log_info(__name__, f'Solving linear system # {j}')
+        theta[:, :, j] = solve_k_dyn.solve(b)
+        if verbose:
+            log_info(__name__, f'Done solving linear system # {j}')
+    if verbose:
+        residual = np.linalg.norm(theta - theta.transpose(0, 2, 1)) / \
+                   np.linalg.norm(theta)
+        log_info(__name__, f'The residual, i.e. the unsymmetric values, are {residual}')
     if symmetric:
         # make Theta symmetric
-        Theta = 1/2*(Theta + Theta.transpose(0, 2, 1))
-    return Theta
+        theta = 1/2*(theta + theta.transpose(0, 2, 1))
+    return theta
 
 
 def shifted_static_derivatives(V, K_func, M, Shifts, x0=None, h=1.0, verbose=True,
