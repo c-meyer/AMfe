@@ -12,6 +12,7 @@ import numpy as np
 import scipy as sp
 from scipy.sparse.linalg import LinearOperator, eigsh, splu
 
+from amfe.linalg.lib import PardisoWrapper
 from amfe.logging import log_info, log_warning, log_debug
 from amfe.linalg.linearsolvers import ScipySparseLinearSolver
 from amfe.linalg.orth import m_orthogonalize
@@ -508,33 +509,39 @@ def static_derivatives(v, k_func, m=None, shift=None, x0=None, h=1.0,
 
     if verbose:
         log_info(__name__, 'Factorizing K...')
-    solve_k_dyn = splu(k_dyn0)
-    if verbose:
-        log_info(__name__, 'Factorizing K completed.')
+    solve_k_dyn = PardisoWrapper(k_dyn0, -2, verbose=True)
+    solve_k_dyn.factor()
+    try:
+        if verbose:
+            log_info(__name__, 'Factorizing K completed.')
 
-    for j, v_j in enumerate(v.T):
-        if verbose:
-            log_info(__name__, 'Computing finite difference K-matrix')
-        dk_dv_j = jacobian_finite_difference(k_func, v_j, x0, h, finite_diff)
-        if np.any(np.isnan(dk_dv_j.data)):
-            log_warning(__name__, 'Caution dK_dv_j contains nans, try with greater h:')
-            dk_dv_j = jacobian_finite_difference(k_func, v_j, x0, h*10, finite_diff)
+        for j, v_j in enumerate(v.T):
+            if verbose:
+                log_info(__name__, 'Computing finite difference K-matrix')
+            dk_dv_j = jacobian_finite_difference(k_func, v_j, x0, h, finite_diff)
             if np.any(np.isnan(dk_dv_j.data)):
-                raise ArithmeticError('Finite Difference Scheme failed')
-        b = - dk_dv_j @ v
+                log_warning(__name__, 'Caution dK_dv_j contains nans, try with greater h:')
+                dk_dv_j = jacobian_finite_difference(k_func, v_j, x0, h*10, finite_diff)
+                if np.any(np.isnan(dk_dv_j.data)):
+                    raise ArithmeticError('Finite Difference Scheme failed')
+            b = - dk_dv_j @ v
+            if verbose:
+                log_info(__name__, f'Solving linear system # {j}')
+            theta[:, :, j] = solve_k_dyn.solve(b)
+            if verbose:
+                log_info(__name__, f'Done solving linear system # {j}')
         if verbose:
-            log_info(__name__, f'Solving linear system # {j}')
-        theta[:, :, j] = solve_k_dyn.solve(b)
-        if verbose:
-            log_info(__name__, f'Done solving linear system # {j}')
-    if verbose:
-        residual = np.linalg.norm(theta - theta.transpose(0, 2, 1)) / \
-                   np.linalg.norm(theta)
-        log_info(__name__, f'The residual, i.e. the unsymmetric values, are {residual}')
-    if symmetric:
-        # make Theta symmetric
-        theta = 1/2*(theta + theta.transpose(0, 2, 1))
-    return theta
+            residual = np.linalg.norm(theta - theta.transpose(0, 2, 1)) / \
+                       np.linalg.norm(theta)
+            log_info(__name__, f'The residual, i.e. the unsymmetric values, are {residual}')
+        if symmetric:
+            # make Theta symmetric
+            theta = 1/2*(theta + theta.transpose(0, 2, 1))
+        return theta
+    except Exception as e:
+        raise e
+    finally:
+        solve_k_dyn.clear()
 
 
 def shifted_static_derivatives(V, K_func, M, Shifts, x0=None, h=1.0, verbose=True,
